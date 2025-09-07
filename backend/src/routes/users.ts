@@ -1,7 +1,6 @@
 import { express } from "express";
 import * as usersController from "../controllers/users.js";
 import * as validation from "../middleware/validation.js";
-im;
 import { isAdmin } from "../middleware/auth.js";
 
 const router = express.Router();

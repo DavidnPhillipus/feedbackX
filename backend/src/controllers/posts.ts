@@ -1,18 +1,17 @@
-import express, {
-  NextFunction,
-  Request,
-  RequestHandler,
-  Response,
-} from "express";
+import type { NextFunction, Request, RequestHandler, Response } from "express";
+
 import prisma from "../prisma";
 import { connect } from "http2";
 
-export const getPosts: RequestHandler = async (req, res) => {
+export const getPosts: RequestHandler = async (req: Request, res: Response) => {
   const posts = await prisma.findMany();
   res.json({ posts });
 };
 
-export const createPost: RequestHandler = async (req, res) => {
+export const createPost: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   const body = req.body;
   const user_id = req.body.user_id;
   const post = await prisma.post.create({
@@ -21,7 +20,11 @@ export const createPost: RequestHandler = async (req, res) => {
   res.status(201).json(post);
 };
 
-export const getPost: RequestHandler = async (req, res, next) => {
+export const getPost: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const post_id = Number.parseInt(req.params.id!);
   const post = await prisma.post.FindUnique({
     where: { id: post_id },
@@ -45,7 +48,10 @@ export const updatePost: RequestHandler = async (req, res) => {
   res.json({ post });
 };
 
-export const deletePost: RequestHandler = async (req, res) => {
+export const deletePost: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   const postId = parseInt(req.params.id!);
   const result = await prisma.post.delete({
     where: { id: postId },
@@ -55,7 +61,10 @@ export const deletePost: RequestHandler = async (req, res) => {
 
 //Moving on to the likes section
 
-export const createLike: RequestHandler = async (req, res) => {
+export const createLike: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   const postId = Number.parseInt(req.params.id!);
   const userId = req.user.id;
 

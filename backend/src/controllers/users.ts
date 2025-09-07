@@ -1,13 +1,17 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import type { NextFunction, Request, RequestHandler, Response } from "express";
 import prisma from "../prisma";
 import * as bcrypt from "bcrypt";
 
-export const getUsers: RequestHandler = async (req, res) => {
+export const getUsers: RequestHandler = async (req: Request, res: Response) => {
   const users = await prisma.user.findMany();
   res.json({ users });
 };
 
-export const getUser: RequestHandler = async (req, res, next) => {
+export const getUser: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const id = Number.parseInt(req.params.id!);
   const user = await prisma.user.findUnique({
     where: { id: id },
@@ -20,7 +24,10 @@ export const getUser: RequestHandler = async (req, res, next) => {
   res.send({ user });
 };
 
-export const updateUser: RequestHandler = async (req, res) => {
+export const updateUser: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   const userId = req.user.id;
   delete req.body.roles;
   const user = await prisma.user.update({
@@ -40,7 +47,10 @@ export const deleteUser: RequestHandler = async (req, res) => {
   res.sendStatus(200);
 };
 
-export const adminDeleteUser: RequestHandler = async (req, res) => {
+export const adminDeleteUser: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   const userId = parseInt(req.params.id!);
   const result = await prisma.user.delete({
     where: { id: userId },
@@ -49,7 +59,11 @@ export const adminDeleteUser: RequestHandler = async (req, res) => {
   res.sendStatus(200);
 };
 
-export const getUserPosts: RequestHandler = async (req, res, next) => {
+export const getUserPosts: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const id = Number.parseInt(req.params.id!);
   const user = await prisma.user.findUnique({
     where: { id: id },
@@ -65,7 +79,11 @@ export const getUserPosts: RequestHandler = async (req, res, next) => {
   res.send({ posts: user.posts });
 };
 
-export const getUserLikedPosts: RequestHandler = async (req, res, next) => {
+export const getUserLikedPosts: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const id = Number.parseInt(req.params.id!);
   const user = await prisma.user.findUnique({
     where: { id: id },
@@ -81,7 +99,11 @@ export const getUserLikedPosts: RequestHandler = async (req, res, next) => {
   res.send({ posts: user.postsLiked });
 };
 
-export const getUserFollowedPosts: RequestHandler = async (req, res, next) => {
+export const getUserFollowedPosts: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const id = Number.parseInt(req.params.id!);
   const user = await prisma.user.findUnique({
     where: { id: id },
