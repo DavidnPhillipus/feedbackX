@@ -38,7 +38,10 @@ export const updateUser: RequestHandler = async (
   res.json({ user });
 };
 
-export const deleteUser: RequestHandler = async (req, res) => {
+export const deleteUser: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   const userId = req.user.id;
   const result = await prisma.user.delete({
     where: { id: userId },
