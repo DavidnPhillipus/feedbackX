@@ -1,9 +1,4 @@
-import express, {
-  NextFunction,
-  Request,
-  RequestHandler,
-  Response,
-} from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import prisma from "../prisma";
 import * as bcrypt from "bcrypt";
 
