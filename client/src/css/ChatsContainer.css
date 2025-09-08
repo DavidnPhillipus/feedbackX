@@ -1,0 +1,14 @@
+.chats-container {
+  max-width: 400px;
+  border: solid 2px #1d4ed8;
+  border-radius: 3px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  border-left: none;
+  height: 100vh;
+}
+
+.chats-wrapper {
+  margin-top: 25px;
+}

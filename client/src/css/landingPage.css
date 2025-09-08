@@ -1,0 +1,129 @@
+.outer-div {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.nav {
+  margin: 0px;
+  background-color: rgba(29, 28, 28, 0.151);
+  height: 50px;
+  display: flex;
+  padding: 15px;
+  justify-content: space-between;
+  align-items: center;
+  color: #007bff;
+  font-family: "Poppins", sans-serif;
+  font-size: 30px;
+  font-weight: 800px;
+}
+
+.btn {
+  border: none;
+  background-color: transparent;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: 450;
+}
+
+.register {
+  background-color: #007bff;
+  padding: 10px 16px;
+  border-radius: 16px;
+  color: white;
+  cursor: pointer;
+  margin: 5px;
+  margin-right: 45px;
+}
+
+.login {
+  background-color: rgba(104, 123, 128, 0.849);
+  padding: 10px 16px;
+  cursor: pointer;
+  color: white;
+  border-radius: 16px;
+  margin: 5px;
+}
+
+.sig-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 20px 50px;
+}
+
+.signature {
+  max-width: 450px;
+}
+
+.sig-text {
+  margin-top: -38px;
+  color: gray;
+  font-family: ganeva;
+  font-size: small;
+}
+.sig {
+  font-size: 40px;
+}
+.hero {
+  max-width: 600px;
+}
+
+.examples {
+  margin-top: 80px;
+  max-height: 500px;
+  border: solid black 3px;
+}
+
+.hw-works {
+  margin-top: 35px;
+  margin-left: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  max-width: 850px;
+}
+.hw-header {
+  display: block;
+  font-size: 30px;
+  margin-bottom: 18px;
+}
+
+.box {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: #2a2a2a;
+  padding: 8px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+  color: white;
+}
+
+.span {
+  margin-top: 14px;
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 0px;
+}
+
+.text {
+  margin-top: -10px;
+  font-size: 12px;
+  font-weight: 400;
+  text-align: center;
+  color: rgba(112, 99, 172, 0.322);
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 70px;
+  margin-bottom: 50px;
+  max-width: 500px;
+  margin-right: 30px;
+  object-fit: fill;
+}

@@ -1,0 +1,31 @@
+.invite-details {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 10px;
+}
+.invite-profile {
+  background-color: blueviolet;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 66509px;
+  width: 35px;
+  height: 35px;
+}
+
+.accept-button {
+  border: none;
+  border-radius: 5px;
+  padding: 3px 8px;
+  background-color: #1d4ed8;
+  color: white;
+}
+
+.decline-button {
+  border: none;
+  border-radius: 5px;
+  padding: 3px 8px;
+  background-color: rgb(160, 157, 157);
+  margin-left: 8px;
+}

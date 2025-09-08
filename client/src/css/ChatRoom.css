@@ -1,0 +1,51 @@
+#chatroom-container {
+  display: flex;
+  flex-direction: column;
+  border: solid 2px #1d4ed8;
+  border-left: none;
+  position: fixed;
+  top: 0%;
+  bottom: 0%;
+  right: 0;
+  left: 485px;
+  max-height: 100vh;
+  min-width: 700px;
+  color: white;
+}
+
+.room-info {
+  display: flex;
+}
+
+.room-profile {
+  height: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: purple;
+}
+
+.bar {
+  height: 60px;
+  width: 100%;
+  background-color: #1d4ed8;
+  position: fixed;
+}
+
+.bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  bottom: 0;
+  height: 40px;
+  background-color: #1d4ed8;
+  width: 100%;
+}
+
+.chats {
+  background-color: cadetblue;
+}
+
+#text {
+  width: 80%;
+}

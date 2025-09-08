@@ -1,0 +1,36 @@
+.outer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: -180px;
+}
+
+.main-content {
+  width: 500px;
+  height: 100vh;
+  background-color: rgba(5, 252, 252, 0.132);
+}
+
+.main-header {
+  background-color: #1d4ed8;
+  display: flex;
+  width: 500px;
+  height: 60px;
+  color: lightgray;
+  font-family: Arial;
+  align-items: center;
+  margin-left: 10px;
+  margin-top: 15px;
+  padding: 3px 30px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-radius: 8px;
+}
+
+.feed {
+  margin-top: 10px;
+}
+
+.main-header span {
+  margin-left: 20px;
+}

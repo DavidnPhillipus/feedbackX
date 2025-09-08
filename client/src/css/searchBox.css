@@ -1,0 +1,41 @@
+.search-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.search-box {
+  width: 390px;
+  height: 100vh;
+  border-radius: 10px;
+  background-color: rgba(99, 92, 92);
+  border: solid 1px lightgray;
+  box-shadow: 0 2px 4px rgba(29, 28, 28, 0.15);
+  padding: 10px;
+}
+
+input {
+  width: 100%;
+  height: 40px;
+  border: solid 1px lightgray;
+  box-shadow: 0 2px 3px rgba(29, 28, 28, 0.15);
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+header {
+  border-bottom: solid 2px lightgray;
+}
+
+a {
+  border-bottom: solid 1px gray;
+  padding: 3px;
+}
+
+.suggestions {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  background-color: blueviolet;
+  padding: 5px;
+}
