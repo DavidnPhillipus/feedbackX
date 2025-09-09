@@ -1,5 +1,5 @@
-import "./css/ChatsContainer.css";
-import ChatRoomTemplate from "./ChatRoomTemplate";
+import "./../css/ChatsContainer.css";
+import ChatRoomTemplate from "../Templates/ChatRoomTemplate";
 
 export default function ChatsContainer() {
   return (

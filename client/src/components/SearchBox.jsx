@@ -1,4 +1,4 @@
-import "./css/searchBox.css";
+import "./../css/searchBox.css";
 import SmallSideBar from "./SmallSideBar";
 import SearchTemplate from "./SearchTemplate";
 

@@ -1,6 +1,6 @@
 import React from "react";
-import "./css/landingPage.css";
-import hero from "./assets/hero.png";
+import "../css/landingPage.css";
+import hero from "../assets/hero.png";
 
 export default function LandingPage() {
   return (

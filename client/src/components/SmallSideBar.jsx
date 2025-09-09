@@ -1,12 +1,12 @@
-import "./css/SmallSideBar.css";
-import home from "./assets/icons/home.png";
-import search from "./assets/icons/search.png";
-import explore from "./assets/icons/explore.png";
-import more from "./assets/icons/more.png";
-import post from "./assets/icons/post.png";
-import projects from "./assets/icons/projects.png";
-import chatroom from "./assets/icons/chatroom.png";
-import profile from "./assets/icons/profile.png";
+import "./../css/SmallSideBar.css";
+import home from "./../assets/icons/home.png";
+import search from "./../assets/icons/search.png";
+import explore from "./../assets/icons/explore.png";
+import more from "./../assets/icons/more.png";
+import post from "./../assets/icons/post.png";
+import projects from "./../assets/icons/projects.png";
+import chatroom from "./../assets/icons/chatroom.png";
+import profile from "./../assets/icons/profile.png";
 
 export default function SmallSideBar() {
   return (

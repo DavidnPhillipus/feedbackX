@@ -1,9 +1,10 @@
-import "./css/ExploreCard.css";
+import "./../css/cardTemplate.css";
 
-export default function ExploreCard({
+export default function cardTemplate({
   category,
   username,
   profilePicture,
+  description,
   title,
   post,
   emojis,
@@ -24,7 +25,8 @@ export default function ExploreCard({
           </div>
         </div>
         <div className="description">
-          <h3>{title}</h3>
+          <h2>{title}</h2>
+          <p>{description}</p>
         </div>
       </div>
       <div className="format-part">

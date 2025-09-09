@@ -1,4 +1,4 @@
-import "./css/Invites.css";
+import "./../css/Invites.css";
 import InvitesTemplate from "./InvitesTemplate";
 export default function Invites() {
   return (

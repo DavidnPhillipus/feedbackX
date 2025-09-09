@@ -1,7 +1,7 @@
-import SideBar from "./SideBar";
-import "./css/ProfilePage.css";
-import CardTemplate from "./CardTemplate";
-import more from "./assets/icons/more.png";
+import SideBar from "../components/SideBar";
+import "./../css/ProfilePage.css";
+import CardTemplate from "../Templates/CardTemplate";
+import more from "../assets/icons/more.png";
 
 export default function ProfilePage() {
   return (

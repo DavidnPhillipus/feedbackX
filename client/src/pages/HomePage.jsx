@@ -1,7 +1,7 @@
-import "./css/HomePage.css";
+import "./../css/HomePage.css";
 import CardTemplate from "./CardTemplate.jsx";
-import Activity from "./Activity";
-import SideBar from "./SideBar.jsx";
+import Activity from "..components/Activity";
+import SideBar from "..components/SideBar";
 
 export default function HomePage() {
   const user = {

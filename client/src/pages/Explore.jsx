@@ -1,6 +1,6 @@
-import "./css/ExplorePage.css";
-import ExploreCard from "./ExploreCard";
-import SmallSideBar from "./SmallSideBar";
+import "./../css/ExplorePage.css";
+import ExploreCard from "./../Templates/ExploreCard";
+import SmallSideBar from "./../components/SmallSideBar";
 
 export default function explorePage() {
   const user = {

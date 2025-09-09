@@ -1,4 +1,4 @@
-import "./css/ChatRoomTemplate.css";
+import "./../css/ChatRoomTemplate.css";
 
 export default function ChatRoomTemplate() {
   return (

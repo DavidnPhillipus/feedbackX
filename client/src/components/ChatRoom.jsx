@@ -1,4 +1,4 @@
-import "./css/ChatRoom.css";
+import "../css/ChatRoom.css";
 
 export default function ChatRoom() {
   return (

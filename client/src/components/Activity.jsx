@@ -1,4 +1,4 @@
-import "./css/Activity.css";
+import "./../css/Activity.css";
 
 export default function Activity() {
   return (

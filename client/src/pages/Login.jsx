@@ -1,6 +1,6 @@
 import React from "react";
-import "./css/login.css";
-import icon from "./assets/google-icon.png";
+import "./../css/login.css";
+import icon from "../assets/google-icon.png";
 
 export default function Login() {
   return (

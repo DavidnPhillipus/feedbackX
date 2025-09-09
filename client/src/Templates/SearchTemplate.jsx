@@ -1,4 +1,4 @@
-import "./css/SearchTemplate.css";
+import "./../css/SearchTemplate.css";
 
 export default function SearchTemplate() {
   return (
