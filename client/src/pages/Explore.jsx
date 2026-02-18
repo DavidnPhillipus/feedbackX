@@ -1,9 +1,22 @@
 import "./../css/ExplorePage.css";
 import ExploreCard from "./../Templates/ExploreCard";
 import SmallSideBar from "../components/SmallSideBar";
-import { explorePosts } from "../mocks/mockData";
+import { useEffect, useState } from "react";
+import { getExplorePosts } from "../services/mockApi";
 
-export default function explorePage() {
+export default function ExplorePage() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    getExplorePosts()
+      .then((d) => mounted && setItems(d))
+      .catch(() => mounted && setItems([]))
+      .finally(() => mounted && setLoading(false));
+    return () => (mounted = false);
+  }, []);
+
   return (
     <div className="explore-container">
       <SmallSideBar />
@@ -24,14 +37,14 @@ export default function explorePage() {
         </div>
         <main>
           <div className="feed">
-            {explorePosts.slice(0, 3).map((p) => (
-              <ExploreCard key={p.id} {...p} />
-            ))}
+            {loading ? (
+              <p>Loading...</p>
+            ) : (
+              items.slice(0, 3).map((p) => <ExploreCard key={p.id} {...p} />)
+            )}
           </div>
           <div className="feed">
-            {explorePosts.slice(3).map((p) => (
-              <ExploreCard key={p.id} {...p} />
-            ))}
+            {!loading && items.slice(3).map((p) => <ExploreCard key={p.id} {...p} />)}
           </div>
         </main>
       </div>
