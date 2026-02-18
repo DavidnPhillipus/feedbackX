@@ -1,4 +1,3 @@
-import SideBar from "../components/SideBar";
 import "./../css/ProfilePage.css";
 import CardTemplate from "../Templates/CardTemplate";
 import { FiMoreHorizontal } from 'react-icons/fi';
@@ -6,13 +5,12 @@ import { FiMoreHorizontal } from 'react-icons/fi';
 export default function ProfilePage() {
   return (
     <div className="outer-container">
-      <SideBar />
       <div className="user-profile-container">
         <div className="profile-header">
           <div className="profile-img">
             <img
               className="profile-picture"
-              src="https://unsplash.com/photos/a-small-bird-perched-on-top-of-a-persons-hand-9yYpMvn-j30"
+              src="https://i.pravatar.cc/120?img=9"
               alt="Profile"
             />
           </div>
