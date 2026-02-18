@@ -6,10 +6,9 @@ import Login from './pages/Login';
 import SideBar from './components/SideBar';
 import Invites from './pages/Invites';
 import FeedbackRooms from './pages/FeedbackRooms';
-import Explore from './Explore'
+import Explore from './pages/Explore';
 
 import { createBrowserRouter } from 'react-router-dom';
-import path from 'path';
 
 
 
@@ -21,7 +20,7 @@ export const router = createBrowserRouter([
         path: '/Register', element: <Register />,
     },
     {
-        path, path: '/Login', element: <Login />,
+         path: '/Login', element: <Login />,
     },
     { element: <SideBar />, children: [
         {path: '/' , element: <HomePage />},
