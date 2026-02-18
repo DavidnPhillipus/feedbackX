@@ -1,22 +1,48 @@
 import "../css/searchBox.css";
 import SmallSideBar from "./SmallSideBar";
 import SearchTemplate from "../Templates/SearchTemplate";
-import { useState, useMemo } from "react";
-
-const mockResults = [
-  { id: 1, title: "David's feedback on UI", avatar: "https://i.pravatar.cc/40?img=1" },
-  { id: 2, title: "Feature request: dark mode", avatar: "https://i.pravatar.cc/40?img=2" },
-  { id: 3, title: "Bug report: search behaves oddly", avatar: "https://i.pravatar.cc/40?img=3" },
-  { id: 4, title: "Explore ideas for onboarding", avatar: "https://i.pravatar.cc/40?img=4" },
-];
+import { useState, useEffect, useRef } from "react";
+import { getPosts } from "../services/mockApi";
 
 export default function SearchBox() {
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const timer = useRef(null);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return mockResults;
-    return mockResults.filter((r) => r.title.toLowerCase().includes(q));
+  useEffect(() => {
+    // initial load: fetch all posts
+    let mounted = true;
+    getPosts().then((items) => {
+      if (mounted) setResults(items || []);
+    }).catch(() => {
+      if (mounted) setResults([]);
+    });
+    return () => (mounted = false);
+  }, []);
+
+  useEffect(() => {
+    // debounce search and simulate API call
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      setLoading(true);
+      getPosts()
+        .then((items) => {
+          const q = (query || "").trim().toLowerCase();
+          if (!q) return setResults(items || []);
+          const filtered = (items || []).filter((it) => {
+            const title = (it.title || it.post || it.username || "").toString().toLowerCase();
+            return title.includes(q);
+          });
+          setResults(filtered);
+        })
+        .catch(() => setResults([]))
+        .finally(() => setLoading(false));
+    }, 300);
+
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
   }, [query]);
 
   return (
@@ -35,9 +61,13 @@ export default function SearchBox() {
           />
         </header>
         <div className="suggestions">
-          {filtered.map((item) => (
-            <SearchTemplate item={item} key={item.id} />
-          ))}
+          {loading ? (
+            <div className="loading">Searching...</div>
+          ) : (
+            results.map((item) => (
+              <SearchTemplate item={item} key={item.id || item._id || JSON.stringify(item)} />
+            ))
+          )}
         </div>
       </div>
     </div>
