@@ -1,5 +1,5 @@
 import "./../css/SideBar.css";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal } from 'react-icons/fi';
 
 export default function SideBar() {
@@ -12,18 +12,18 @@ export default function SideBar() {
         f<span style={{ color: "blue" }}>X</span>
       </h1>
       <div className="icons-container">
-        <Link className="icon" to="/">
+        <NavLink className="icon" to="/">
           <FiHome size={20} aria-hidden="true"/>
           <span>Home</span>
-        </Link>
-        <Link className="icon" to="/Search">
+        </NavLink>
+        <NavLink className="icon" to="/Search">
           <FiSearch size={20} aria-hidden="true"/>
           <span>Search</span>
-        </Link>
-        <Link className="icon" to="/Explore">
+        </NavLink>
+        <NavLink className="icon" to="/Explore">
           <FiCompass size={20} aria-hidden="true"/>
           <span>Explore</span>
-        </Link>
+        </NavLink>
         <div className="icon">
           <FiPlusSquare size={20} aria-hidden="true"/>
           <span>Post</span>
@@ -36,10 +36,10 @@ export default function SideBar() {
           <FiMessageCircle size={20} aria-hidden="true"/>
           <span>Chatroom</span>
         </div>
-        <Link className="icon" to="/Profile">
+        <NavLink className="icon" to="/Profile">
           <FiUser size={20} aria-hidden="true"/>
           <span>Profile</span>
-        </Link>
+        </NavLink>
         <div className="icon">
           <FiMoreHorizontal size={20} aria-hidden="true"/>
           <span>More</span>

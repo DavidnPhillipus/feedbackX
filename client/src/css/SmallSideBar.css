@@ -20,6 +20,29 @@
   font-family: arial;
 }
 
+.icon {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f172a;
+  text-decoration: none;
+  border-radius: 8px;
+  margin: 6px 4px;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.icon:hover,
+.icon:focus {
+  background-color: rgba(30,64,175,0.08);
+  color: #1d4ed8;
+}
+
+.icon[aria-current="page"] {
+  background-color: rgba(29,78,216,0.12);
+  color: #1d4ed8;
+}
+
 img {
-  margin: 15px;
+  margin: 8px;
 }

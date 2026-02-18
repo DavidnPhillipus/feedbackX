@@ -35,8 +35,36 @@
   font-family: arial;
 }
 
+.icon {
+  padding: 8px 10px;
+  gap: 8px;
+  color: #0f172a;
+  text-decoration: none;
+  border-radius: 8px;
+  margin: 6px 4px;
+  transition: background-color 120ms ease, color 120ms ease;
+  cursor: pointer;
+}
+
+.icon span {
+  font-size: 14px;
+}
+
+.icon:hover,
+.icon:focus {
+  background-color: rgba(30,64,175,0.08);
+  color: #1d4ed8;
+}
+
+/* active route (NavLink sets aria-current="page") */
+.icon[aria-current="page"] {
+  background-color: rgba(29,78,216,0.12);
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
 img {
-  margin: 10px;
+  margin: 6px;
 }
 
 @media (max-width: 1172px) {

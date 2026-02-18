@@ -1,5 +1,5 @@
 import "./../css/SmallSideBar.css";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal } from 'react-icons/fi';
 
 export default function SmallSideBar() {
@@ -16,15 +16,15 @@ export default function SmallSideBar() {
         f<span style={{ color: "blue" }}>X</span>
       </h1>
       <div className="icons-container">
-        <Link className="icon" to="/">
+        <NavLink className="icon" to="/">
           <FiHome size={18} />
-        </Link>
-        <Link className="icon" to="/Search">
+        </NavLink>
+        <NavLink className="icon" to="/Search">
           <FiSearch size={18} />
-        </Link>
-        <Link className="icon" to="/Explore">
+        </NavLink>
+        <NavLink className="icon" to="/Explore">
           <FiCompass size={18} />
-        </Link>
+        </NavLink>
         <div className="icon">
           <FiPlusSquare size={18} />
         </div>
@@ -34,9 +34,9 @@ export default function SmallSideBar() {
         <div className="icon">
           <FiMessageCircle size={18} />
         </div>
-        <Link className="icon" to="/Profile">
+        <NavLink className="icon" to="/Profile">
           <FiUser size={18} />
-        </Link>
+        </NavLink>
         <div className="icon">
           <FiMoreHorizontal size={18} />
         </div>
