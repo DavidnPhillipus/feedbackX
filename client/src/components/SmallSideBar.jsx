@@ -16,30 +16,30 @@ export default function SmallSideBar() {
         f<span style={{ color: "blue" }}>X</span>
       </h1>
       <div className="icons-container">
-        <NavLink className="icon" to="/">
+        <NavLink className="icon" to="/" title="Home" aria-label="Home">
           <FiHome size={18} />
         </NavLink>
-        <NavLink className="icon" to="/Search">
+        <NavLink className="icon" to="/Search" title="Search" aria-label="Search">
           <FiSearch size={18} />
         </NavLink>
-        <NavLink className="icon" to="/Explore">
+        <NavLink className="icon" to="/Explore" title="Explore" aria-label="Explore">
           <FiCompass size={18} />
         </NavLink>
-        <div className="icon">
+        <button className="icon" type="button" title="Post" aria-label="Post">
           <FiPlusSquare size={18} />
-        </div>
-        <div className="icon">
+        </button>
+        <button className="icon" type="button" title="My Projects" aria-label="My Projects">
           <FiFolder size={18} />
-        </div>
-        <div className="icon">
+        </button>
+        <button className="icon" type="button" title="Chatroom" aria-label="Chatroom">
           <FiMessageCircle size={18} />
-        </div>
-        <NavLink className="icon" to="/Profile">
+        </button>
+        <NavLink className="icon" to="/Profile" title="Profile" aria-label="Profile">
           <FiUser size={18} />
         </NavLink>
-        <div className="icon">
+        <button className="icon" type="button" title="More" aria-label="More">
           <FiMoreHorizontal size={18} />
-        </div>
+        </button>
       </div>
     </div>
   );

@@ -12,38 +12,38 @@ export default function SideBar() {
         f<span style={{ color: "blue" }}>X</span>
       </h1>
       <div className="icons-container">
-        <NavLink className="icon" to="/">
-          <FiHome size={20} aria-hidden="true"/>
+        <NavLink className="icon" to="/" title="Home" aria-label="Home">
+          <FiHome size={20} aria-hidden="true" />
           <span>Home</span>
         </NavLink>
-        <NavLink className="icon" to="/Search">
-          <FiSearch size={20} aria-hidden="true"/>
+        <NavLink className="icon" to="/Search" title="Search" aria-label="Search">
+          <FiSearch size={20} aria-hidden="true" />
           <span>Search</span>
         </NavLink>
-        <NavLink className="icon" to="/Explore">
-          <FiCompass size={20} aria-hidden="true"/>
+        <NavLink className="icon" to="/Explore" title="Explore" aria-label="Explore">
+          <FiCompass size={20} aria-hidden="true" />
           <span>Explore</span>
         </NavLink>
-        <div className="icon">
-          <FiPlusSquare size={20} aria-hidden="true"/>
+        <button className="icon" type="button" title="Post" aria-label="Post">
+          <FiPlusSquare size={20} aria-hidden="true" />
           <span>Post</span>
-        </div>
-        <div className="icon">
-          <FiFolder size={20} aria-hidden="true"/>
+        </button>
+        <button className="icon" type="button" title="My Projects" aria-label="My Projects">
+          <FiFolder size={20} aria-hidden="true" />
           <span>My Projects</span>
-        </div>
-        <div className="icon">
-          <FiMessageCircle size={20} aria-hidden="true"/>
+        </button>
+        <button className="icon" type="button" title="Chatroom" aria-label="Chatroom">
+          <FiMessageCircle size={20} aria-hidden="true" />
           <span>Chatroom</span>
-        </div>
-        <NavLink className="icon" to="/Profile">
-          <FiUser size={20} aria-hidden="true"/>
+        </button>
+        <NavLink className="icon" to="/Profile" title="Profile" aria-label="Profile">
+          <FiUser size={20} aria-hidden="true" />
           <span>Profile</span>
         </NavLink>
-        <div className="icon">
-          <FiMoreHorizontal size={20} aria-hidden="true"/>
+        <button className="icon" type="button" title="More" aria-label="More">
+          <FiMoreHorizontal size={20} aria-hidden="true" />
           <span>More</span>
-        </div>
+        </button>
       </div>
     </div>
   );
