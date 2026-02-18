@@ -4,6 +4,7 @@ import Profile from './pages/Profile';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import SideBar from './components/SideBar';
+import SearchBox from './components/SearchBox';
 import Invites from './pages/Invites';
 import FeedbackRooms from './pages/FeedbackRooms';
 import Explore from './pages/Explore';
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
     },
     { element: <SideBar />, children: [
         {path: '/' , element: <HomePage />},
+        {path: '/Search', element: <SearchBox />},
         {path: '/Profile', element: <Profile />},
         {path: '/Explore', element: <Explore />},
         {path: 'feedbackRooms', element: <FeedbackRooms />},

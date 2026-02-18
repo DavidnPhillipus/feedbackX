@@ -1,18 +1,8 @@
 import "./../css/SideBar.css";
-import SearchBox from "./SearchBox";
-import { useState } from "react";
-import home from "./../assets/icons/home.png";
-import search from "./../assets/icons/search.png";
-import explore from "./../assets/icons/explore.png";
-import more from "./../assets/icons/more.png";
-import post from "./../assets/icons/post.png";
-import projects from "./../assets/icons/projects.png";
-import chatroom from "./../assets/icons/chatroom.png";
-import profile from "./../assets/icons/profile.png";
+import { Link } from "react-router-dom";
+import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal } from 'react-icons/fi';
 
 export default function SideBar() {
-  const [openSearch, setOpenSearch] = useState(true);
-
   return (
     <div className="sidebar">
       <h1 className="logo-full">
@@ -22,41 +12,36 @@ export default function SideBar() {
         f<span style={{ color: "blue" }}>X</span>
       </h1>
       <div className="icons-container">
-        <div className="icon">
-          <img src={home} alt="home-icon" width={25} />
+        <Link className="icon" to="/">
+          <FiHome size={20} aria-hidden="true"/>
           <span>Home</span>
-        </div>
-        <div
-          className="icon"
-          onClick={(openSearch) => {
-            setOpenSearch(!openSearch);
-          }}
-        >
-          <img src={search} alt="search-icon" width={25} />
-          {openSearch ? <span>Search</span> : <SearchBox></SearchBox>}
-        </div>
-        <div className="icon">
-          <img src={explore} alt="explore-icon" width={25} />
+        </Link>
+        <Link className="icon" to="/Search">
+          <FiSearch size={20} aria-hidden="true"/>
+          <span>Search</span>
+        </Link>
+        <Link className="icon" to="/Explore">
+          <FiCompass size={20} aria-hidden="true"/>
           <span>Explore</span>
-        </div>
+        </Link>
         <div className="icon">
-          <img src={post} alt="post-icon" width={25} />
+          <FiPlusSquare size={20} aria-hidden="true"/>
           <span>Post</span>
         </div>
         <div className="icon">
-          <img src={projects} alt="projects-icon" width={25} />
-          My Projects
+          <FiFolder size={20} aria-hidden="true"/>
+          <span>My Projects</span>
         </div>
         <div className="icon">
-          <img src={chatroom} alt="chatroom-icon" width={30} />
-          Chatroom
+          <FiMessageCircle size={20} aria-hidden="true"/>
+          <span>Chatroom</span>
         </div>
+        <Link className="icon" to="/Profile">
+          <FiUser size={20} aria-hidden="true"/>
+          <span>Profile</span>
+        </Link>
         <div className="icon">
-          <img src={profile} alt="chatroom-icon" width={25} />
-          Profile
-        </div>
-        <div className="icon">
-          <img src={more} alt="more-icon" width={25} />
+          <FiMoreHorizontal size={20} aria-hidden="true"/>
           <span>More</span>
         </div>
       </div>

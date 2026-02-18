@@ -1,12 +1,6 @@
 import "./../css/SmallSideBar.css";
-import home from "./../assets/icons/home.png";
-import search from "./../assets/icons/search.png";
-import explore from "./../assets/icons/explore.png";
-import more from "./../assets/icons/more.png";
-import post from "./../assets/icons/post.png";
-import projects from "./../assets/icons/projects.png";
-import chatroom from "./../assets/icons/chatroom.png";
-import profile from "./../assets/icons/profile.png";
+import { Link } from "react-router-dom";
+import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal } from 'react-icons/fi';
 
 export default function SmallSideBar() {
   return (
@@ -22,29 +16,29 @@ export default function SmallSideBar() {
         f<span style={{ color: "blue" }}>X</span>
       </h1>
       <div className="icons-container">
+        <Link className="icon" to="/">
+          <FiHome size={18} />
+        </Link>
+        <Link className="icon" to="/Search">
+          <FiSearch size={18} />
+        </Link>
+        <Link className="icon" to="/Explore">
+          <FiCompass size={18} />
+        </Link>
         <div className="icon">
-          <img src={home} alt="home-icon" width={25} />
+          <FiPlusSquare size={18} />
         </div>
         <div className="icon">
-          <img src={search} alt="search-icon" width={25} />
+          <FiFolder size={18} />
         </div>
         <div className="icon">
-          <img src={explore} alt="explore-icon" width={25} />
+          <FiMessageCircle size={18} />
         </div>
+        <Link className="icon" to="/Profile">
+          <FiUser size={18} />
+        </Link>
         <div className="icon">
-          <img src={post} alt="post-icon" width={25} />
-        </div>
-        <div className="icon">
-          <img src={projects} alt="projects-icon" width={25} />
-        </div>
-        <div className="icon">
-          <img src={chatroom} alt="chatroom-icon" width={30} />
-        </div>
-        <div className="icon">
-          <img src={profile} alt="chatroom-icon" width={25} />
-        </div>
-        <div className="icon">
-          <img src={more} alt="more-icon" width={25} />
+          <FiMoreHorizontal size={18} />
         </div>
       </div>
     </div>
