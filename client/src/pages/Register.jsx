@@ -1,5 +1,5 @@
 import "./../css/register.css";
-import icon from "../assets/google-icon.png";
+import { FcGoogle } from 'react-icons/fc';
 
 export default function Login() {
   return (
@@ -19,7 +19,7 @@ export default function Login() {
           Join the feedback revolution - where every opinion fuels innovation
         </h4>
         <button className="google">
-          <img src={icon} alt="google icon" width={25} />
+          <FcGoogle size={20} style={{ marginRight: 8 }} aria-hidden="true" />
           Continue with Google
         </button>
         <div className="or-container">

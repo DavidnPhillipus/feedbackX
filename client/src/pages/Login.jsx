@@ -1,6 +1,6 @@
 import React from "react";
 import "./../css/login.css";
-import icon from "../assets/google-icon.png";
+import { FcGoogle } from 'react-icons/fc';
 
 export default function Login() {
   return (
@@ -30,7 +30,7 @@ export default function Login() {
           </div>
 
           <button className="google">
-            <img src={icon} alt="google icon" width={25} />
+            <FcGoogle size={20} style={{ marginRight: 8 }} aria-hidden="true" />
             Continue with Google
           </button>
           <p className="forgot-password">

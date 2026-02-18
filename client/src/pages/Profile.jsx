@@ -1,7 +1,7 @@
 import SideBar from "../components/SideBar";
 import "./../css/ProfilePage.css";
 import CardTemplate from "../Templates/CardTemplate";
-import more from "../assets/icons/more.png";
+import { FiMoreHorizontal } from 'react-icons/fi';
 
 export default function ProfilePage() {
   return (
@@ -20,13 +20,7 @@ export default function ProfilePage() {
             <div className="profile-edit">
               <span className="username">david.n.phillipus</span>
               <button className="edit-profile">Edit profile</button>
-              <img
-                className="more-icon"
-                src={more}
-                alt="More options"
-                width={24}
-                height={24}
-              />
+              <FiMoreHorizontal className="more-icon" size={20} aria-hidden="true" />
             </div>
             <div className="profile-stats">
               <span className="posts-count">Posts: 10</span>
