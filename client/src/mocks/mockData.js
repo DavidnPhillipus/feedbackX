@@ -1,0 +1,82 @@
+export const posts = [
+  {
+    id: 1,
+    username: "David Phillipus",
+    profilePicture: "https://i.pravatar.cc/80?img=1",
+    title: "Design critique: landing hero",
+    description: "Looking for feedback on hero section spacing and copy.",
+    category: "Web Design",
+    post: "https://picsum.photos/600/400?image=10",
+    emojis: ["👍", "❤️", "😄"],
+  },
+  {
+    id: 2,
+    username: "Aisha Khan",
+    profilePicture: "https://i.pravatar.cc/80?img=2",
+    title: "Prototype usability test results",
+    description: "Summary of the first round of usability tests.",
+    category: "UX",
+    post: "https://picsum.photos/600/400?image=20",
+    emojis: ["🔥", "❤️", "👏"],
+  },
+  {
+    id: 3,
+    username: "Peter Thiel",
+    profilePicture: "https://i.pravatar.cc/80?img=3",
+    title: "Experimenting with micro-interactions",
+    description: "Micro-interactions for button states and animations.",
+    category: "Frontend",
+    post: "https://picsum.photos/600/400?image=30",
+    emojis: ["✨", "👍"],
+  },
+];
+
+export const explorePosts = [
+  ...posts,
+  {
+    id: 4,
+    username: "Maya",
+    profilePicture: "https://i.pravatar.cc/80?img=4",
+    title: "Branding for indie apps",
+    description: "Thoughts on reusable branding tokens.",
+    category: "Branding",
+    post: "https://picsum.photos/600/400?image=40",
+    emojis: ["🎨", "👍"],
+  },
+];
+
+export const rooms = [
+  {
+    id: "r1",
+    name: "feedbackX YouTube Channel",
+    avatar: "https://i.pravatar.cc/40?img=5",
+    lastMessage: "I think your video was too long",
+    date: "27/08/25",
+    unread: 5,
+  },
+  {
+    id: "r2",
+    name: "Landing Page Reviews",
+    avatar: "https://i.pravatar.cc/40?img=6",
+    lastMessage: "Consider reducing the hero height",
+    date: "02/02/26",
+    unread: 0,
+  },
+];
+
+export const invites = [
+  {
+    id: "i1",
+    title: "Design Sprint",
+    about: "Review Motherboards",
+    avatar: "https://i.pravatar.cc/40?img=7",
+  },
+  {
+    id: "i2",
+    title: "Beta Testers",
+    about: "Help test onboarding",
+    avatar: "https://i.pravatar.cc/40?img=8",
+  },
+];
+
+export default { posts, explorePosts, rooms, invites };

@@ -1,18 +1,10 @@
 import "./../css/HomePage.css";
-import CardTemplate from "./CardTemplate.jsx";
-import Activity from "..components/Activity";
-import SideBar from "..components/SideBar";
+import CardTemplate from "../Templates/CardTemplate.jsx";
+import Activity from "../components/Activity";
+import SideBar from "../components/SideBar";
+import { posts } from "../mocks/mockData";
 
 export default function HomePage() {
-  const user = {
-    username: "David Phillipus",
-    profilePicture:
-      "https://unsplash.com/photos/a-small-bird-perched-on-top-of-a-persons-hand-9yYpMvn-j30",
-    title: "This is just a title nothing more nothing less",
-    category: "Web Design",
-    post: "https://unsplash.com/photos/a-small-bird-perched-on-top-of-a-persons-hand-9yYpMvn-j30",
-    emojis: ["👍", "❤️", "😄"],
-  };
   return (
     <div className="outer-container">
       <div className="main-content">
@@ -23,30 +15,18 @@ export default function HomePage() {
           <span>Trending now</span>
         </div>
         <div className="feed">
-          <CardTemplate
-            username={user.username}
-            category={user.category}
-            title={user.title}
-            post={user.post}
-            profilePicture={user.profilePicture}
-            emojis={user.emojis}
-          />
-          <CardTemplate
-            username={user.username}
-            category={user.category}
-            title={user.title}
-            post={user.post}
-            profilePicture={user.profilePicture}
-            emojis={user.emojis}
-          />
-          <CardTemplate
-            username={user.username}
-            category={user.category}
-            title={user.title}
-            post={user.post}
-            profilePicture={user.profilePicture}
-            emojis={user.emojis}
-          />
+          {posts.map((p) => (
+            <CardTemplate
+              key={p.id}
+              username={p.username}
+              category={p.category}
+              title={p.title}
+              description={p.description}
+              post={p.post}
+              profilePicture={p.profilePicture}
+              emojis={p.emojis}
+            />
+          ))}
         </div>
       </div>
       <Activity />

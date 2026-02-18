@@ -1,20 +1,9 @@
 import "./../css/ExplorePage.css";
 import ExploreCard from "./../Templates/ExploreCard";
-import SmallSideBar from "./../components/SmallSideBar";
+import SmallSideBar from "../components/SmallSideBar";
+import { explorePosts } from "../mocks/mockData";
 
 export default function explorePage() {
-  const user = {
-    username: "Peter Thiel",
-    profilePicture:
-      "https://unsplash.com/photos/a-small-bird-perched-on-top-of-a-persons-hand-9yYpMvn-j30",
-    title: "TThis is PayPal we found a way to bring cash in to emails ",
-    postDescription:
-      "Pay pal is a platfeom where you can easily exchange money via just emails super innovative rigth? I know.",
-    category: "Web Design",
-    post: "https://unsplash.com/photos/a-small-bird-perched-on-top-of-a-persons-hand-9yYpMvn-j30",
-    emojis: ["👍", "❤️", "😄"],
-  };
-
   return (
     <div className="explore-container">
       <SmallSideBar />
@@ -35,62 +24,14 @@ export default function explorePage() {
         </div>
         <main>
           <div className="feed">
-            <ExploreCard
-              username={user.username}
-              description={user.postDescription}
-              category={user.category}
-              title={user.title}
-              post={user.post}
-              profilePicture={user.profilePicture}
-              emojis={user.emojis}
-            />
-            <ExploreCard
-              username={user.username}
-              description={user.postDescription}
-              category={user.category}
-              title={user.title}
-              post={user.post}
-              profilePicture={user.profilePicture}
-              emojis={user.emojis}
-            />
-            <ExploreCard
-              username={user.username}
-              description={user.postDescription}
-              category={user.category}
-              title={user.title}
-              post={user.post}
-              profilePicture={user.profilePicture}
-              emojis={user.emojis}
-            />
+            {explorePosts.slice(0, 3).map((p) => (
+              <ExploreCard key={p.id} {...p} />
+            ))}
           </div>
           <div className="feed">
-            <ExploreCard
-              username={user.username}
-              description={user.postDescription}
-              category={user.category}
-              title={user.title}
-              post={user.post}
-              profilePicture={user.profilePicture}
-              emojis={user.emojis}
-            />
-            <ExploreCard
-              username={user.username}
-              description={user.postDescription}
-              category={user.category}
-              title={user.title}
-              post={user.post}
-              profilePicture={user.profilePicture}
-              emojis={user.emojis}
-            />
-            <ExploreCard
-              username={user.username}
-              description={user.postDescription}
-              category={user.category}
-              title={user.title}
-              post={user.post}
-              profilePicture={user.profilePicture}
-              emojis={user.emojis}
-            />
+            {explorePosts.slice(3).map((p) => (
+              <ExploreCard key={p.id} {...p} />
+            ))}
           </div>
         </main>
       </div>

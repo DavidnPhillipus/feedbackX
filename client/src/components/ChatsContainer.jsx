@@ -1,5 +1,6 @@
 import "./../css/ChatsContainer.css";
 import ChatRoomTemplate from "../Templates/ChatRoomTemplate";
+import { rooms } from "../mocks/mockData";
 
 export default function ChatsContainer() {
   return (
@@ -11,10 +12,9 @@ export default function ChatsContainer() {
         id="search-chat"
       />
       <div className="chats-wrapper">
-        <ChatRoomTemplate />
-        <ChatRoomTemplate />
-        <ChatRoomTemplate />
-        <ChatRoomTemplate />
+        {rooms.map((r) => (
+          <ChatRoomTemplate key={r.id} item={r} />
+        ))}
       </div>
     </div>
   );
