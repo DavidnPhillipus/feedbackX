@@ -1,51 +1,59 @@
 #chatroom-container {
   display: flex;
   flex-direction: column;
-  border: solid 2px #1d4ed8;
+  border: 1px solid #e6eefc;
   border-left: none;
-  position: fixed;
-  top: 0%;
-  bottom: 0%;
-  right: 0;
-  left: 485px;
-  max-height: 100vh;
-  min-width: 700px;
-  color: white;
+  flex: 1 1 auto;
+  min-width: 320px;
+  max-width: 900px;
+  color: #0f172a;
+  background: #fff;
 }
 
 .room-info {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
 }
 
 .room-profile {
-  height: 40px;
+  width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: purple;
+  background-color: #8b5cf6;
+  overflow: hidden;
 }
 
 .bar {
   height: 60px;
   width: 100%;
   background-color: #1d4ed8;
-  position: fixed;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
 }
 
 .bottom-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: fixed;
-  bottom: 0;
-  height: 40px;
-  background-color: #1d4ed8;
-  width: 100%;
+  height: 56px;
+  background-color: #fff;
+  border-top: 1px solid #eef2ff;
+  padding: 8px;
 }
 
 .chats {
-  background-color: cadetblue;
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 12px;
+  background-color: #fafafa;
 }
 
 #text {
-  width: 80%;
+  width: 100%;
+  resize: vertical;
+  min-height: 40px;
 }

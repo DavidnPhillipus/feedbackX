@@ -1,26 +1,30 @@
 .outer-container {
   display: flex;
-  flex-direction: row;
-  align-items: top;
+  flex-direction: column;
+  align-items: stretch;
 }
 .user-profile-container {
   flex: 1;
   padding: 20px;
   margin-top: 0;
+  width: 100%;
+  max-width: 800px;
 }
 .profile-header {
   display: flex;
   align-items: center;
   background-color: #fff;
-  border-bottom: 1px solid #ddd;
-  width: 700px;
+  border-bottom: 1px solid #eee;
+  width: 100%;
 }
 
 .profile-img {
-  width: 284px;
-  height: 181px;
-  margin-left: 20px;
+  width: 120px;
+  height: 120px;
+  margin-left: 8px;
   background-color: #b4adad;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .edit-profile {
@@ -33,9 +37,9 @@
 
 .profile-info {
   display: flex;
-  font-size: 20px;
+  font-size: 16px;
   flex-direction: column;
-  margin-left: 80px;
+  margin-left: 18px;
 }
 
 .profile-info span {
@@ -45,7 +49,7 @@
 }
 
 .more-icon {
-  margin: -9px 10px;
+  margin-left: 8px;
 }
 
 .full-name {
