@@ -1,5 +1,6 @@
 import "./../css/ExplorePage.css";
 import ExploreCard from "./../Templates/ExploreCard";
+import Activity from "../components/Activity";
 import { useEffect, useState } from "react";
 import { getExplorePosts } from "../services/mockApi";
 
