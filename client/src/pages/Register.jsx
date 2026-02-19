@@ -1,7 +1,20 @@
 import "./../css/register.css";
 import { FcGoogle } from 'react-icons/fc';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Register() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    // mock register then navigate to home
+    navigate('/');
+  }
+
   return (
     <div className="outer-container">
       <div className="form-container">
@@ -27,11 +40,13 @@ export default function Login() {
           <span className="or-text">OR</span>
           <div className="line"></div>
         </div>
-        <form id="form">
+        <form id="form" onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Email or username"
             className=" input input-field"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="text"
@@ -44,13 +59,20 @@ export default function Login() {
             placeholder="Username"
             className="input username"
             id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <input
             type="password"
             placeholder="Password"
             className="input password"
             id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
+          <button type="submit" id="reg">
+            Sign Up
+          </button>
         </form>
         <div className="terms">
           <p className="text">
@@ -85,13 +107,10 @@ export default function Login() {
             </span>
           </p>
         </div>
-        <button type="submit" id="reg">
-          Sign Up
-        </button>
       </div>
       <div className="login-container">
         <p className="have-account">Have an account?</p>
-        <p className="login">Login</p>
+        <p className="login" onClick={() => navigate('/Login')}>Login</p>
       </div>
       <footer className="footer">
         <div>

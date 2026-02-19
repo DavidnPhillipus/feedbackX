@@ -1,8 +1,10 @@
 import React from "react";
 import "../css/landingPage.css";
 import hero from "../assets/hero.png";
+import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   return (
     <div className="outer-div">
       <header>
@@ -21,8 +23,8 @@ export default function LandingPage() {
           <div className="nav-btns">
             <button className="btn">How it works</button>
             <button className="btn">Categories</button>
-            <button className="btn login">Login</button>
-            <button className="btn register">Regster</button>
+            <button className="btn login" onClick={() => navigate('/Login')}>Login</button>
+            <button className="btn register" onClick={() => navigate('/Register')}>Register</button>
           </div>
         </nav>
       </header>

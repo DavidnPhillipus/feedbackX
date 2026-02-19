@@ -1,24 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import "./../css/login.css";
 import { FcGoogle } from 'react-icons/fc';
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    // mock auth: navigate to home
+    navigate('/');
+  }
+
   return (
     <div className="outer-container">
       <div className="form-container">
         <h1 style={{ fontSize: 36, fontFamily: "ganeva" }}>
           feedback<span style={{ color: "blue" }}>X</span>
         </h1>
-        <form className="form">
+        <form className="form" onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Email or username"
             className=" input input-field"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="password"
             placeholder="Password"
             className="input input-field"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <button type="submit" className="login">
             Login
@@ -29,7 +44,7 @@ export default function Login() {
             <div className="line"></div>
           </div>
 
-          <button className="google">
+          <button type="button" className="google">
             <FcGoogle size={20} style={{ marginRight: 8 }} aria-hidden="true" />
             Continue with Google
           </button>
@@ -40,7 +55,7 @@ export default function Login() {
       </div>
       <div className="register-container">
         <p className="register-text">
-          Don't have an account? <button className="register">Register</button>
+          Don't have an account? <button className="register" onClick={() => navigate('/Register')}>Register</button>
         </p>
       </div>
       <div className="footer-login">
