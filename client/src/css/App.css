@@ -10,15 +10,26 @@
   flex-direction: column;
 } */
 
+/* layout variables */
+.app-layout {
+  --sidebar-width: 222px;
+}
+
 /* Layout content area (space for the fixed sidebar) */
 .content {
-  margin-left: 222px;
+  margin-left: var(--sidebar-width, 222px);
   padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 1172px) {
+  .app-layout {
+    --sidebar-width: 48px;
+  }
+
   .content {
-    margin-left: 48px;
+    margin-left: var(--sidebar-width);
     padding: 12px;
   }
 }

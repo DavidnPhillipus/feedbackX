@@ -9,6 +9,7 @@
   left: 0;
   bottom: 0%;
   margin-right: 0px;
+  z-index: 50;
 }
 .icons-container {
   display: flex;
