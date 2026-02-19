@@ -17,34 +17,34 @@ export default function ExplorePage() {
   }, []);
 
   return (
-    <div className="explore-container">
-      <div className="outer-container">
-        <header>
-          <h1 className="first-header">Explore</h1>
-        </header>
-
-        <div className="search">
-          <input type="text" placeholder="Search" id="search-input" />
-        </div>
-        <div className="categories">
-          <span>All</span>
-          <span>Web design</span>
-          <span>YouTube</span>
-          <span>Writting</span>
-          <span>AI/ML</span>
-        </div>
+    <div className="page-inner container">
+      <div className="columns">
         <main>
+          <header>
+            <h1 className="first-header">Explore</h1>
+          </header>
+
+          <div className="search">
+            <input type="text" placeholder="Search" id="search-input" />
+          </div>
+          <div className="categories">
+            <span>All</span>
+            <span>Web design</span>
+            <span>YouTube</span>
+            <span>Writting</span>
+            <span>AI/ML</span>
+          </div>
           <div className="feed">
             {loading ? (
               <p>Loading...</p>
             ) : (
-              items.slice(0, 3).map((p) => <ExploreCard key={p.id} {...p} />)
+              items.map((p) => <ExploreCard key={p.id} {...p} />)
             )}
           </div>
-          <div className="feed">
-            {!loading && items.slice(3).map((p) => <ExploreCard key={p.id} {...p} />)}
-          </div>
         </main>
+        <aside>
+          <Activity />
+        </aside>
       </div>
     </div>
   );

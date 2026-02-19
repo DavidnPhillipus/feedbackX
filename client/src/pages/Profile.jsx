@@ -4,33 +4,42 @@ import { FiMoreHorizontal } from 'react-icons/fi';
 
 export default function ProfilePage() {
   return (
-    <div className="outer-container">
-      <div className="user-profile-container">
-        <div className="profile-header">
-          <div className="profile-img">
-            <img
-              className="profile-picture"
-              src="https://i.pravatar.cc/120?img=9"
-              alt="Profile"
-            />
-          </div>
-          <div className="profile-info">
-            <div className="profile-edit">
-              <span className="username">david.n.phillipus</span>
-              <button className="edit-profile">Edit profile</button>
-              <FiMoreHorizontal className="more-icon" size={20} aria-hidden="true" />
+    <div className="page-inner container">
+      <div className="columns">
+        <main>
+          <div className="user-profile-container">
+            <div className="profile-header">
+              <div className="profile-img">
+                <img
+                  className="profile-picture"
+                  src="https://i.pravatar.cc/120?img=9"
+                  alt="Profile"
+                />
+              </div>
+              <div className="profile-info">
+                <div className="profile-edit">
+                  <span className="username">david.n.phillipus</span>
+                  <button className="edit-profile">Edit profile</button>
+                  <FiMoreHorizontal className="more-icon" size={20} aria-hidden="true" />
+                </div>
+                <div className="profile-stats">
+                  <span className="posts-count">Posts: 10</span>
+                  <span className="categories">100 categories</span>
+                </div>
+                <h3 className="full-name">David Phillipus</h3>
+                <p className="bio">
+                  This is just a bio nothing more nothing less but it can be
+                  anything you want
+                </p>
+              </div>
             </div>
-            <div className="profile-stats">
-              <span className="posts-count">Posts: 10</span>
-              <span className="categories">100 categories</span>
-            </div>
-            <h3 className="full-name">David Phillipus</h3>
-            <p className="bio">
-              This is just a bio nothing more nothing less but it can be
-              anything you want
-            </p>
           </div>
-        </div>
+        </main>
+        <aside>
+          <div className="card-base">
+            <h3 className="muted">Suggested</h3>
+          </div>
+        </aside>
       </div>
     </div>
   );
