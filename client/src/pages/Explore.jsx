@@ -1,6 +1,5 @@
 import "./../css/ExplorePage.css";
 import ExploreCard from "./../Templates/ExploreCard";
-import SmallSideBar from "../components/SmallSideBar";
 import { useEffect, useState } from "react";
 import { getExplorePosts } from "../services/mockApi";
 
@@ -19,7 +18,6 @@ export default function ExplorePage() {
 
   return (
     <div className="explore-container">
-      <SmallSideBar />
       <div className="outer-container">
         <header>
           <h1 className="first-header">Explore</h1>

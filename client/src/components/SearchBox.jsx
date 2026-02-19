@@ -1,5 +1,4 @@
 import "../css/searchBox.css";
-import SmallSideBar from "./SmallSideBar";
 import SearchTemplate from "../Templates/SearchTemplate";
 import { useState, useEffect, useRef } from "react";
 import { getPosts } from "../services/mockApi";
@@ -47,7 +46,6 @@ export default function SearchBox() {
 
   return (
     <div className="search-container">
-      <SmallSideBar />
       <div className="search-box">
         <header>
           <h1>Search</h1>
