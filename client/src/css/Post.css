@@ -1,0 +1,5 @@
+.post-page{max-width:800px;margin:0 auto}
+.post-form .input{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:12px}
+.btn{background:var(--accent, #1d4ed8);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+.actions{display:flex;justify-content:flex-end}
+.textarea{min-height:140px}

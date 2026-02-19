@@ -8,6 +8,8 @@ import SearchBox from './components/SearchBox';
 import Invites from './pages/Invites';
 import FeedbackRooms from './pages/FeedbackRooms';
 import Explore from './pages/Explore';
+import PostPage from './pages/Post';
+import MyProjects from './pages/MyProjects';
 
 import { createBrowserRouter } from 'react-router-dom';
 
@@ -25,6 +27,8 @@ export const router = createBrowserRouter([
     },
     { element: <SideBar />, children: [
         {path: '/' , element: <HomePage />},
+        {path: '/post', element: <PostPage />},
+        {path: '/projects', element: <MyProjects />},
         {path: '/Search', element: <SearchBox />},
         {path: '/Profile', element: <Profile />},
         {path: '/Explore', element: <Explore />},
