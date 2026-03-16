@@ -30,52 +30,39 @@ export default function Activity() {
     };
   }, []);
 
-  return (
-    <div className="wrapper">
-      <h3>Activity</h3>
-      <div className="invites">
-        <div className="invites-header">
-          <h3>Invites</h3>
-          <a className="invites-count">{invites.length}</a>
-        </div>
-        {invites.slice(0, 3).map((inv) => (
-          <div key={inv.id} className="invite-details">
-            <div className="invite-profile">
-              {inv.title ? inv.title.charAt(0) : "?"}
-            </div>
-            <div className="invite-info">
-              <h4 className="invite-title">{inv.title}</h4>
-              <p className="invite-about"> {inv.about}</p>
-              <button className="accept-button">Accept</button>
-              <button className="decline-button">Decline</button>
-            </div>
-          </div>
-        ))}
-        {invites.length > 3 && (
-          <div className="see-all">
-            <Link to="/feedbackRooms">See all invites on Chatrooms page</Link>
-          </div>
-        )}
-      </div>
+  const latestInvite = invites[0];
+  const latestRoom = rooms[0];
 
-      <div className="rooms">
-        <h3>Feedback Rooms</h3>
-        {rooms.slice(0, 3).map((r) => (
-          <div key={r.id} className="room-details">
-            <div className="room-profile">
-              {r.name ? r.name.charAt(0) : "?"}
+  return (
+    <div className="activity-compact">
+      <h3>Activity</h3>
+      <div className="activity-sections">
+        <div className="invites-section">
+          <h4>Invites</h4>
+          {latestInvite && (
+            <div className="latest-item">
+              <div className="item-profile">{latestInvite.title ? latestInvite.title.charAt(0) : "?"}</div>
+              <div className="item-info">
+                <p className="item-title">{latestInvite.title}</p>
+                <p className="item-count">New: {invites.length}</p>
+              </div>
             </div>
-            <div className="room-info">
-              <h4 className="room-title">{r.name}</h4>
-              <p className="room-about"> {r.lastMessage}</p>
+          )}
+          <Link to="/feedbackRooms" className="view-all">View All</Link>
+        </div>
+        <div className="feedback-section">
+          <h4>Feedback</h4>
+          {latestRoom && (
+            <div className="latest-item">
+              <div className="item-profile">{latestRoom.name ? latestRoom.name.charAt(0) : "?"}</div>
+              <div className="item-info">
+                <p className="item-title">{latestRoom.name}</p>
+                <p className="item-count">Total: {rooms.length}</p>
+              </div>
             </div>
-          </div>
-        ))}
-        {rooms.length > 3 && (
-          <div className="see-all">
-            <Link to="/feedbackRooms">See all rooms</Link>
-          </div>
-        )}
+          )}
+          <Link to="/feedbackRooms" className="view-all">View All</Link>
+        </div>
       </div>
     </div>
   );

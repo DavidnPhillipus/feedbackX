@@ -33,9 +33,9 @@ export default function SmallSideBar() {
             <NavLink className="icon" to="/Explore" title="Explore" aria-label="Explore">
               <FiCompass size={18} />
             </NavLink>
-            <button className="icon" type="button" title="Post" aria-label="Post">
+            <NavLink className="icon" to="/post" title="Post" aria-label="Post">
               <FiPlusSquare size={18} />
-            </button>
+            </NavLink>
             <NavLink className="icon" to="/projects" title="My Projects" aria-label="My Projects">
               <FiFolder size={18} />
             </NavLink>

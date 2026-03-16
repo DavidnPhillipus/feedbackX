@@ -19,15 +19,38 @@
   border-radius: 8px;
 }
 
+.home-page {
+  min-height: 100vh;
+}
+
+.page-inner {
+  height: 100%;
+}
+
+.columns {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+main {
+  flex: 1;
+}
+
+aside {
+  width: 250px;
+}
+
 .feed {
   margin-top: 12px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  height: 100vh;
+  overflow-y: auto;
   justify-content: center;
   max-width: none;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .main-header span {

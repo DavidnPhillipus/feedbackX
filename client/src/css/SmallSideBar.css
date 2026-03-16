@@ -1,10 +1,10 @@
 :root {
-  --icon-compact-width: 60px;
+  --icon-compact-width: 66px;
   --icon-size: 48px;
   --icon-padding: 0.5rem;
   --icon-gap: 0.375rem;
   --icon-margin: 0.25rem;
-  --sidebar-width: 60px;
+  --sidebar-width: 66px;
 }
 
 .sidebar-small {

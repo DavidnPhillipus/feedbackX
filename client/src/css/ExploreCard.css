@@ -1,21 +1,43 @@
 .card {
-  background: #2563eb;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 0;
-  margin: 10px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border: 3px solid transparent;
+  border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  width: 330px;
+  width: 100%;
   height: auto;
+  height: 300px;
   overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.card:hover {
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
 }
 
 .card-header {
   display: flex;
-  gap: 12px;
-  padding: 10px;
+  gap: 15px;
+  padding: 0;
   align-items: flex-start;
+  margin-bottom: 15px;
 }
 
 .card-author-image {
@@ -79,25 +101,69 @@
 }
 
 .format {
-  width: 320px;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 10px;
-  background-color: #f0f0f0;
-  margin: 5px;
+  width: 470px;
+  height: 100vh;
+  max-width: 100%;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  overflow: hidden;
+  margin: 10px 0;
+  position: relative;
 }
 
-.format img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.format-part {
+  display: flex;
+  flex-direction: column;
 }
-.username {
-  font-size: 10px;
-  font-family: sans-serif;
-  font-weight: bold;
-  color: #333;
+
+.reactions {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.emojis {
+  display: flex;
+  gap: 8px;
+}
+
+.emoji {
+  background: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.emoji:hover {
+  background: #e5e7eb;
+}
+
+.feedback-button {
+  padding: 12px 20px;
+  background: black;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  border: none;
+  border-radius: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feedback-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  background: #333;
+}
 }
 
 .category {

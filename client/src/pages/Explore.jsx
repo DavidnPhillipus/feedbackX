@@ -93,8 +93,8 @@ export default function ExplorePage() {
   }, [page, selectedCategory]);
 
   return (
-    <div className="page-inner container">
-      <div className="columns">
+    <div className="explore-page">
+      <div className="page-inner">
         <main>
           <div className="main-header">
             <span>
@@ -132,9 +132,6 @@ export default function ExplorePage() {
             </div>
           )}
         </main>
-        <aside>
-          <Activity />
-        </aside>
       </div>
     </div>
   );

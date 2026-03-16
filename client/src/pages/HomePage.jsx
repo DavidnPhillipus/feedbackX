@@ -70,41 +70,45 @@ export default function HomePage() {
   }, [page]);
 
   return (
-    <div className="page-inner container">
+    <div className="page-inner">
       <div className="main-header">
         <span>
           <strong>Following</strong>
         </span>
         <span>Trending now</span>
       </div>
-      <main>
-        <div className="feed">
-          {items.length === 0 && loading ? (
-            <p>Loading...</p>
-          ) : items.length === 0 ? (
-            <p>No posts yet</p>
-          ) : (
-            items.slice(0, 1).map((p) => (
-              <CardTemplate
-                key={p.id}
-                username={p.username}
-                category={p.category}
-                title={p.title}
-                description={p.description}
-                post={p.post}
-                profilePicture={p.profilePicture}
-                emojis={p.emojis}
-              />
-            ))
-          )}
-        </div>
-        {hasMore && (
-          <div ref={loadMoreRef} className="load-more-trigger">
-            {loading && <p>Loading more posts...</p>}
+      <div className="columns">
+        <main>
+          <div className="feed">
+            {items.length === 0 && loading ? (
+              <p>Loading...</p>
+            ) : items.length === 0 ? (
+              <p>No posts yet</p>
+            ) : (
+              items.map((p) => (
+                <CardTemplate
+                  key={p.id}
+                  username={p.username}
+                  category={p.category}
+                  title={p.title}
+                  description={p.description}
+                  post={p.post}
+                  profilePicture={p.profilePicture}
+                  emojis={p.emojis}
+                />
+              ))
+            )}
           </div>
-        )}
-      </main>
-      <Activity />
+          {hasMore && (
+            <div ref={loadMoreRef} className="load-more-trigger">
+              {loading && <p>Loading more posts...</p>}
+            </div>
+          )}
+        </main>
+        <aside>
+          <Activity />
+        </aside>
+      </div>
     </div>
   );
 }

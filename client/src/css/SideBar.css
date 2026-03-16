@@ -1,9 +1,13 @@
+:root {
+  --sidebar-width: 222px;
+}
+
 .sidebar {
   border-right: solid 3px #1d4ed8;
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: var(--sidebar-width, 222px);
+  width: 222px;
   padding: 10px;
   position: sticky;
   top: 0;
@@ -71,7 +75,7 @@ img {
 /* Keep sidebar consistent across sizes. Responsive adjustments removed
    so the sidebar does not disappear or change width on smaller screens. */
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .sidebar {
     width: 60px;
     border-right: none;
@@ -94,4 +98,4 @@ img {
   .content {
     padding: 0;
   }
-}
+} */

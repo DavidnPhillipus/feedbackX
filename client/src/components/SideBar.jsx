@@ -1,24 +1,36 @@
 import "./../css/SideBar.css";
 import { NavLink, Outlet } from "react-router-dom";
 import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal } from 'react-icons/fi';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SearchModal from "./SearchModal";
 import SmallSideBar from "./SmallSideBar";
-import { useSidebar } from "./SidebarContext";
 
 export default function SideBar() {
-  const { isCompact } = useSidebar();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsCompact(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   if (isCompact) {
-    return <SmallSideBar />;
+    return (
+      <div className="app-layout">
+        <SmallSideBar />
+        <main className="content">
+          <div className="page-wrapper">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    );
   }
 
   return (
     <div className="app-layout">
-      {isSearchOpen ? (
-        <SearchModal onClose={() => setIsSearchOpen(false)} />
-      ) : (
       <aside className="sidebar">
         <h1 className="logo-full">
           feedback<span style={{ color: "blue" }}>X</span>
@@ -31,7 +43,7 @@ export default function SideBar() {
             <FiHome size={20} aria-hidden="true" />
             <span>Home</span>
           </NavLink>
-          <button className="icon" type="button" title="Search" aria-label="Search" onClick={() => setIsSearchOpen(true)}>
+          <button className="icon" type="button" title="Search" aria-label="Search" onClick={() => setIsCompact(true)}>
             <FiSearch size={20} aria-hidden="true" />
             <span>Search</span>
           </button>
@@ -61,10 +73,10 @@ export default function SideBar() {
           </button>
         </div>
       </aside>
-      )}
-
       <main className="content">
-        <Outlet />
+        <div className="page-wrapper">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
