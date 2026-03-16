@@ -10,21 +10,17 @@ export default function ExploreCard({
 }) {
   return (
     <div className="card">
-      <div className="details-continer">
-        <div className="profile-container">
-          <div className="author">
-            <div className="user-profile">
-              <img src={profilePicture} alt="User Profile" />
+      <div className="card-header">
+        <img src={profilePicture} alt={username} className="card-author-image" />
+        <div className="card-header-content">
+          <div className="card-header-top">
+            <span className="card-author-name">{username}</span>
+            <div className="card-badges">
+              <button className="card-badge">{category}</button>
+              <button className="card-badge">Post</button>
             </div>
-            <span className="username">{username}</span>
           </div>
-          <div className="category-format">
-            <button className="category">{category}</button>
-            <button className="category">Image</button>
-          </div>
-        </div>
-        <div className="description">
-          <h3>{title}</h3>
+          <h2 className="card-title">{title}</h2>
         </div>
       </div>
       <div className="format-part">

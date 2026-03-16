@@ -10,6 +10,7 @@
   margin-right: 0px;
   z-index: 50;
 }
+
 .icons-container {
   display: flex;
   flex-direction: column;
@@ -19,23 +20,25 @@
 
 .logo-compact {
   display: none;
+  font-size: 1.5rem;
+  font-family: "ganeva";
+  margin: 10px 0;
+  text-align: center;
 }
 .logo-full {
   display: inline;
-  font-size: 30;
+  font-size: 1.875rem;
   font-family: "ganeva";
-  margin-top: 30;
-  margin-left: 15;
+  margin-top: 1.875rem;
+  margin-left: 0.9375rem;
 }
 
 .icon {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   font-family: arial;
-}
-
-.icon {
   padding: 8px 10px;
   gap: 8px;
   color: #0f172a;
@@ -44,7 +47,7 @@
   margin: 6px 4px;
   transition: background-color 120ms ease, color 120ms ease;
   cursor: pointer;
-  flex: 0 0 auto;
+  height: 40px;
 }
 
 .icon span {
@@ -52,11 +55,6 @@
 }
 
 /* Fix SVG icon sizing so they don't scale with container */
-.icon svg {
-  width: 20px;
-  height: 20px;
-  display: block;
-}
 
 .icon:hover,
 .icon:focus {
@@ -65,49 +63,35 @@
 }
 
 /* active route (NavLink sets aria-current="page") */
-.icon[aria-current="page"] {
-  background-color: rgba(29,78,216,0.12);
-  color: #1d4ed8;
-  font-weight: 600;
-}
 
 img {
   margin: 6px;
 }
 
-@media (max-width: 1172px) {
-  .sidebar {
-    width: var(--sidebar-width, 48px);
-  }
+/* Keep sidebar consistent across sizes. Responsive adjustments removed
+   so the sidebar does not disappear or change width on smaller screens. */
 
-  /* hide label text on small screens - show icons only */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+    border-right: none;
+    border-left: solid 3px #1d4ed8;
+    padding: 5px;
+  }
+  .icon {
+    padding: 8px;
+    gap: 0;
+  }
   .icon span {
     display: none;
-  }
-
-  .icons-container {
-    overflow: hidden;
-  }
-
-  .logo-compact {
-    display: inline;
-    font-size: 30;
-    font-family: "ganeva";
-    margin-top: 30;
-    margin-left: 10px;
   }
   .logo-full {
     display: none;
   }
-
-  /* center icons when labels are hidden */
-  .icon {
-    justify-content: center;
-    padding: 10px;
+  .logo-compact {
+    display: block;
   }
-
-  /* hide label text on small screens - show icons only */
-  .icon span {
-    display: none;
+  .content {
+    padding: 0;
   }
 }

@@ -1,4 +1,23 @@
-.feedback-room-container {
-  display: flex;
-  flex-direction: row;
+/* always show two columns on chat page: list then conversation */
+.page-inner.container .columns {
+  grid-template-columns: 320px 1fr;
 }
+
+/* even on narrow screens keep list visible (we no longer collapse) */
+@media (max-width: 980px) {
+  .page-inner.container .columns {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+/* when room is active, swap: conversation then list */
+.page-inner.container .columns.room-active {
+  grid-template-columns: 1fr 320px;
+}
+
+@media (max-width: 980px) {
+  .page-inner.container .columns.room-active {
+    grid-template-columns: 1fr 240px;
+  }
+}
+

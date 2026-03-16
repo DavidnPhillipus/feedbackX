@@ -29,6 +29,76 @@
       "category": "Frontend",
       "post": "https://picsum.photos/600/400?image=30",
       "emojis": ["✨", "👍"]
+    },
+    {
+      "id": 4,
+      "username": "Maya Johnson",
+      "profilePicture": "https://i.pravatar.cc/80?img=4",
+      "title": "New color palette exploration",
+      "description": "Testing accessibility-first color schemes.",
+      "category": "Design",
+      "post": "https://picsum.photos/600/400?image=40",
+      "emojis": ["🎨", "👍", "❤️"]
+    },
+    {
+      "id": 5,
+      "username": "James Wilson",
+      "profilePicture": "https://i.pravatar.cc/80?img=5",
+      "title": "Mobile app animation suite",
+      "description": "Smooth transitions and gesture controls.",
+      "category": "Frontend",
+      "post": "https://picsum.photos/600/400?image=50",
+      "emojis": ["✨", "🔥"]
+    },
+    {
+      "id": 6,
+      "username": "Sarah Chen",
+      "profilePicture": "https://i.pravatar.cc/80?img=6",
+      "title": "Typography update v2.0",
+      "description": "New font pairings for better readability.",
+      "category": "Design",
+      "post": "https://picsum.photos/600/400?image=60",
+      "emojis": ["👍"]
+    },
+    {
+      "id": 7,
+      "username": "Marcus Lee",
+      "profilePicture": "https://i.pravatar.cc/80?img=7",
+      "title": "React performance optimization",
+      "description": "Reducing bundle size by 40%.",
+      "category": "Frontend",
+      "post": "https://picsum.photos/600/400?image=70",
+      "emojis": ["🔥", "👍", "✨"]
+    },
+    {
+      "id": 8,
+      "username": "Lisa Park",
+      "profilePicture": "https://i.pravatar.cc/80?img=8",
+      "title": "User research findings",
+      "description": "Key insights from user interviews.",
+      "category": "UX",
+      "post": "https://picsum.photos/600/400?image=80",
+      "emojis": ["❤️", "👍"]
+    },
+    {
+      "id": 9,
+      "username": "Tom Anderson",
+      "profilePicture": "https://i.pravatar.cc/80?img=9",
+      "title": "Dark mode implementation",
+      "description": "Complete dark theme for all pages.",
+      "category": "Frontend",
+      "post": "https://picsum.photos/600/400?image=90",
+      "emojis": ["🌙", "👍"]
+    },
+    {
+      "id": 10,
+      "username": "Emma Rodriguez",
+      "profilePicture": "https://i.pravatar.cc/80?img=10",
+      "title": "Whitespace and grid systems",
+      "description": "Establishing consistent spacing rules.",
+      "category": "Design",
+      "post": "https://picsum.photos/600/400?image=11",
+      "emojis": ["👍", "❤️"]
     }
   ],
   "explorePosts": [
@@ -64,31 +134,275 @@
     },
     {
       "id": 4,
-      "username": "Maya",
+      "username": "Maya Johnson",
       "profilePicture": "https://i.pravatar.cc/80?img=4",
       "title": "Branding for indie apps",
       "description": "Thoughts on reusable branding tokens.",
       "category": "Branding",
       "post": "https://picsum.photos/600/400?image=40",
       "emojis": ["🎨", "👍"]
+    },
+    {
+      "id": 5,
+      "username": "James Wilson",
+      "profilePicture": "https://i.pravatar.cc/80?img=5",
+      "title": "Dashboard redesign for analytics",
+      "description": "Improving data visualization and KPI tracking.",
+      "category": "Web Design",
+      "post": "https://picsum.photos/600/400?image=50",
+      "emojis": ["👍", "❤️", "😄", "🔥"]
+    },
+    {
+      "id": 6,
+      "username": "Sarah Chen",
+      "profilePicture": "https://i.pravatar.cc/80?img=6",
+      "title": "Accessibility audit completed",
+      "description": "WCAG 2.1 AA compliance review.",
+      "category": "UX",
+      "post": "https://picsum.photos/600/400?image=60",
+      "emojis": ["👍", "✨"]
+    },
+    {
+      "id": 7,
+      "username": "Marcus Lee",
+      "profilePicture": "https://i.pravatar.cc/80?img=7",
+      "title": "React performance optimization",
+      "description": "Reducing bundle size by 40%.",
+      "category": "Frontend",
+      "post": "https://picsum.photos/600/400?image=70",
+      "emojis": ["🔥", "👍", "✨"]
+    },
+    {
+      "id": 8,
+      "username": "Lisa Park",
+      "profilePicture": "https://i.pravatar.cc/80?img=8",
+      "title": "Mobile navigation patterns",
+      "description": "Best practices for mobile menus.",
+      "category": "UX",
+      "post": "https://picsum.photos/600/400?image=80",
+      "emojis": ["👍", "❤️"]
+    },
+    {
+      "id": 9,
+      "username": "Tom Anderson",
+      "profilePicture": "https://i.pravatar.cc/80?img=9",
+      "title": "Form validation UX",
+      "description": "Better error messages and feedback.",
+      "category": "UX",
+      "post": "https://picsum.photos/600/400?image=90",
+      "emojis": ["👍", "💡"]
+    },
+    {
+      "id": 10,
+      "username": "Emma Rodriguez",
+      "profilePicture": "https://i.pravatar.cc/80?img=10",
+      "title": "Icon design system",
+      "description": "Consistent iconography guidelines.",
+      "category": "Design",
+      "post": "https://picsum.photos/600/400?image=11",
+      "emojis": ["👍", "❤️"]
+    },
+    {
+      "id": 11,
+      "username": "Alex Turner",
+      "profilePicture": "https://i.pravatar.cc/80?img=11",
+      "title": "Loading states animation",
+      "description": "Skeleton screens and progress indicators.",
+      "category": "Frontend",
+      "post": "https://picsum.photos/600/400?image=12",
+      "emojis": ["✨", "👍"]
+    },
+    {
+      "id": 12,
+      "username": "Nina Patel",
+      "profilePicture": "https://i.pravatar.cc/80?img=12",
+      "title": "Color contrast guidelines",
+      "description": "Ensuring WCAG AA standards.",
+      "category": "Design",
+      "post": "https://picsum.photos/600/400?image=13",
+      "emojis": ["👍", "🎨"]
+    },
+    {
+      "id": 13,
+      "username": "Chris Kumar",
+      "profilePicture": "https://i.pravatar.cc/80?img=13",
+      "title": "API integration patterns",
+      "description": "Best practices for API consumption.",
+      "category": "Frontend",
+      "post": "https://picsum.photos/600/400?image=14",
+      "emojis": ["👍", "🔥"]
+    },
+    {
+      "id": 14,
+      "username": "Diana López",
+      "profilePicture": "https://i.pravatar.cc/80?img=14",
+      "title": "Responsive design testing",
+      "description": "Testing across all breakpoints.",
+      "category": "UX",
+      "post": "https://picsum.photos/600/400?image=15",
+      "emojis": ["👍", "❤️"]
+    }
+  ],
+  "projects": [
+    {
+      "id": "p1",
+      "title": "Redesign landing page",
+      "status": "In Progress",
+      "description": "Complete redesign of the homepage with new layout",
+      "category": "Web Design",
+      "progress": 65,
+      "dueDate": "15/03/26",
+      "team": ["David Phillipus", "Aisha Khan"]
+    },
+    {
+      "id": "p2",
+      "title": "Mobile app authentication",
+      "status": "Planning",
+      "description": "Implement secure authentication flow for mobile",
+      "category": "Frontend",
+      "progress": 20,
+      "dueDate": "01/04/26",
+      "team": ["Peter Thiel", "James Wilson"]
+    },
+    {
+      "id": "p3",
+      "title": "Dashboard analytics module",
+      "status": "In Progress",
+      "description": "Build real-time analytics dashboard",
+      "category": "Web Design",
+      "progress": 45,
+      "dueDate": "10/03/26",
+      "team": ["Maya Johnson", "Sarah Chen"]
+    },
+    {
+      "id": "p4",
+      "title": "API documentation",
+      "status": "In Progress",
+      "description": "Complete REST API documentation",
+      "category": "Documentation",
+      "progress": 80,
+      "dueDate": "20/02/26",
+      "team": ["Marcus Lee"]
+    },
+    {
+      "id": "p5",
+      "title": "Component library v2",
+      "status": "Planning",
+      "description": "Build reusable component library",
+      "category": "Frontend",
+      "progress": 10,
+      "dueDate": "15/04/26",
+      "team": ["David Phillipus", "Maya Johnson"]
+    },
+    {
+      "id": "p6",
+      "title": "Dark mode implementation",
+      "status": "In Progress",
+      "description": "Add dark theme support to all applications",
+      "category": "Frontend",
+      "progress": 55,
+      "dueDate": "28/02/26",
+      "team": ["Tom Anderson", "Lisa Park"]
+    },
+    {
+      "id": "p7",
+      "title": "User research study",
+      "status": "Planning",
+      "description": "Conduct user interviews and surveys",
+      "category": "UX",
+      "progress": 30,
+      "dueDate": "05/03/26",
+      "team": ["Aisha Khan", "Emma Rodriguez"]
+    },
+    {
+      "id": "p8",
+      "title": "Performance optimization",
+      "status": "In Progress",
+      "description": "Improve page load times and core web vitals",
+      "category": "Frontend",
+      "progress": 70,
+      "dueDate": "25/02/26",
+      "team": ["Marcus Lee", "James Wilson"]
     }
   ],
   "rooms": [
     {
       "id": "r1",
-      "name": "feedbackX YouTube Channel",
+      "name": "Landing Page Redesign",
       "avatar": "https://i.pravatar.cc/40?img=5",
-      "lastMessage": "I think your video was too long",
-      "date": "27/08/25",
-      "unread": 5
+      "lastMessage": "Great improvements! The spacing looks much better",
+      "date": "18/02/26",
+      "unread": 3
     },
     {
       "id": "r2",
-      "name": "Landing Page Reviews",
+      "name": "Mobile Auth Flow",
       "avatar": "https://i.pravatar.cc/40?img=6",
-      "lastMessage": "Consider reducing the hero height",
-      "date": "02/02/26",
+      "lastMessage": "Need feedback on the signup validation",
+      "date": "17/02/26",
+      "unread": 1
+    },
+    {
+      "id": "r3",
+      "name": "Dashboard Analytics",
+      "avatar": "https://i.pravatar.cc/40?img=7",
+      "lastMessage": "The charts look fantastic!",
+      "date": "19/02/26",
+      "unread": 5
+    },
+    {
+      "id": "r4",
+      "name": "Component Library",
+      "avatar": "https://i.pravatar.cc/40?img=8",
+      "lastMessage": "Let's discuss the button variants",
+      "date": "16/02/26",
       "unread": 0
+    },
+    {
+      "id": "r5",
+      "name": "API Documentation Review",
+      "avatar": "https://i.pravatar.cc/40?img=9",
+      "lastMessage": "Documentation looks comprehensive",
+      "date": "15/02/26",
+      "unread": 2
+    },
+    {
+      "id": "r6",
+      "name": "Dark Mode Feedback",
+      "avatar": "https://i.pravatar.cc/40?img=10",
+      "lastMessage": "Love the dark theme implementation",
+      "date": "19/02/26",
+      "unread": 4
+    },
+    {
+      "id": "r7",
+      "name": "Performance Optimization",
+      "avatar": "https://i.pravatar.cc/40?img=11",
+      "lastMessage": "Great job reducing the bundle size",
+      "date": "18/02/26",
+      "unread": 0
+    },
+    {
+      "id": "r8",
+      "name": "User Research Findings",
+      "avatar": "https://i.pravatar.cc/40?img=12",
+      "lastMessage": "Really insightful user feedback",
+      "date": "17/02/26",
+      "unread": 2,
+      "messages": [
+        {
+          "id": "m1",
+          "sender": "Alice",
+          "text": "Hey everyone, sharing the latest user insights.",
+          "timestamp": "2026-02-20T10:15:00Z"
+        },
+        {
+          "id": "m2",
+          "sender": "Bob",
+          "text": "Thanks Alice, they look great!",
+          "timestamp": "2026-02-20T10:17:00Z"
+        }
+      ]
     }
   ],
   "invites": [
@@ -96,13 +410,43 @@
       "id": "i1",
       "title": "Design Sprint",
       "about": "Review Motherboards",
-      "avatar": "https://i.pravatar.cc/40?img=7"
+      "avatar": "https://i.pravatar.cc/40?img=7",
+      "postId": 1
     },
     {
       "id": "i2",
       "title": "Beta Testers",
       "about": "Help test onboarding",
-      "avatar": "https://i.pravatar.cc/40?img=8"
+      "avatar": "https://i.pravatar.cc/40?img=8",
+      "postId": 2
+    },
+    {
+      "id": "i3",
+      "title": "Q1 Planning Meeting",
+      "about": "Strategic planning session",
+      "avatar": "https://i.pravatar.cc/40?img=9",
+      "postId": 3
+    },
+    {
+      "id": "i4",
+      "title": "UX Workshop",
+      "about": "Learn design systems",
+      "avatar": "https://i.pravatar.cc/40?img=10",
+      "postId": 4
+    },
+    {
+      "id": "i5",
+      "title": "Frontend Meetup",
+      "about": "React best practices",
+      "avatar": "https://i.pravatar.cc/40?img=11",
+      "postId": 5
+    },
+    {
+      "id": "i6",
+      "title": "Design feedback session",
+      "about": "Review new designs",
+      "avatar": "https://i.pravatar.cc/40?img=12",
+      "postId": 6
     }
   ]
 }

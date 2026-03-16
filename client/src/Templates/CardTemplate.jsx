@@ -1,4 +1,5 @@
 import "./../css/cardTemplate.css";
+import { useState } from "react";
 
 export default function cardTemplate({
   category,
@@ -9,24 +10,31 @@ export default function cardTemplate({
   post,
   emojis,
 }) {
+  const [localEmojis, setLocalEmojis] = useState(emojis);
+
+  const emojiCounts = localEmojis.reduce((acc, emoji) => {
+    acc[emoji] = (acc[emoji] || 0) + 1;
+    return acc;
+  }, {});
+
+  const addReaction = (emoji) => {
+    setLocalEmojis([...localEmojis, emoji]);
+  };
+
   return (
     <div className="card">
-      <div className="details-continer">
-        <div className="profile-container">
-          <div className="author">
-            <div className="user-profile">
-              <img src={profilePicture} alt="User Profile" />
+      <div className="card-header">
+        <img src={profilePicture} alt={username} className="card-author-image" />
+        <div className="card-header-content">
+          <div className="card-header-top">
+            <span className="card-author-name">{username}</span>
+            <div className="card-badges">
+              <button className="card-badge">{category}</button>
+              <button className="card-badge">Post</button>
             </div>
-            <span className="username">{username}</span>
           </div>
-          <div className="category-format">
-            <button className="category">{category}</button>
-            <button className="category">Image</button>
-          </div>
-        </div>
-        <div className="description">
-          <h2>{title}</h2>
-          <p>{description}</p>
+          <h2 className="card-title">{title}</h2>
+          <p className="card-description">{description}</p>
         </div>
       </div>
       <div className="format-part">
@@ -34,13 +42,13 @@ export default function cardTemplate({
           <img src={post}></img>
         </div>
         <div className="reactions">
-          <span className="emojis">
-            {emojis.map((emoji, index) => (
-              <span key={index} className="emoji">
-                {emoji}
-              </span>
+          <div className="emojis">
+            {Object.entries(emojiCounts).map(([emoji, count]) => (
+              <button key={emoji} className="emoji" onClick={() => addReaction(emoji)}>
+                {emoji} {count}
+              </button>
             ))}
-          </span>
+          </div>
 
           <button className="feedback-button">Give Feedback</button>
         </div>

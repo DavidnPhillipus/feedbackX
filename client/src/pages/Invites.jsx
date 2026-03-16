@@ -17,9 +17,20 @@ export default function Invites() {
   }, []);
 
   return (
-    <div className="invites-wrapper">
-      <h1 className="invites-h3">Invites</h1>
-      {loading ? <p>Loading...</p> : items.map((i) => <InvitesTemplate item={i} key={i.id} />)}
+    <div className="page-inner container">
+      <div className="columns">
+        <main>
+          <div className="main-header">
+            <span>
+              <strong>Invites</strong>
+            </span>
+            <span>Pending invitations</span>
+          </div>
+          <div className="invites-wrapper">
+            {loading ? <p>Loading...</p> : items.map((i) => <InvitesTemplate item={i} key={i.id} />)}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

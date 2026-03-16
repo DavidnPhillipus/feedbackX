@@ -16,6 +16,7 @@
   gap: 12px;
   padding: 10px;
   align-items: flex-start;
+  position: relative;
 }
 
 .card-author-image {
@@ -74,7 +75,7 @@
 .card-description {
   margin: 0;
   font-size: 11px;
-  color: #6b7280;
+  color: #000;
   line-height: 1.4;
 }
 
@@ -93,11 +94,12 @@
   height: 100%;
   object-fit: cover;
 }
+
 .username {
   font-size: 10px;
   font-family: sans-serif;
   font-weight: bold;
-  color: #333;
+  color: white;
 }
 
 .category {
@@ -107,13 +109,49 @@
   padding: 3px 5px;
   font-size: 8px;
   font-weight: 400;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+}
+
+.description {
+  width: 100%;
+  padding: 0 5px;
+}
+
+.description h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.3;
+}
+
+.description p {
+  margin: 2px 0 0 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
 }
 
 .reactions {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0 5px 5px 5px;
 }
+
+.project-unread-badge {
+  display: flex;
+  align-items: center;
+}
+
+.unread-indicator {
+  font-size: 11px;
+  color: white;
+  font-weight: 600;
+}
+
 .feedback-button {
   padding: 8px 14px;
   background-color: black;
@@ -133,8 +171,21 @@
   background-color: #1d4ed8;
 }
 
-.span {
-  background-color: transparent;
-  width: 100px;
-  height: 20px;
+.format-part {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+    height: auto;
+  }
+
+  .format {
+    width: 100%;
+  }
 }

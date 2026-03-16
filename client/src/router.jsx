@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
         {path: '/Search', element: <SearchBox />},
         {path: '/Profile', element: <Profile />},
         {path: '/Explore', element: <Explore />},
-        {path: 'feedbackRooms', element: <FeedbackRooms />},
+        {path: '/feedbackRooms', element: <FeedbackRooms />},
         {path: '/Invites', element: <Invites />},
     ]},
 

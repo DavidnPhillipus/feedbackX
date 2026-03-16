@@ -8,26 +8,25 @@
 }
 
 *{box-sizing:border-box}
-html,body,#root{height:100%;margin:0;padding:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color:#0f172a}
+#root{height:100%;margin:0;padding:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color:#0f172a}
 
 a{color:inherit}
 button{font-family:inherit}
 
 /* Utility */
-.container{max-width:var(--max-content-width);margin:0 auto;width:100%;}
+.container{max-width:none;margin:0;width:100%;}
 
 /* Basic card reset used by templates */
-.card-base{background:#fff;border-radius:12px;border:1px solid rgba(15,23,42,0.05);box-shadow:0 1px 4px rgba(2,6,23,0.04);padding:16px}
 
 /* layout helpers */
 .app-layout{display:grid;grid-template-columns:var(--sidebar-width) 1fr;min-height:100vh}
 .sidebar{width:var(--sidebar-width);}
 .content{padding:20px}
-.page-inner{max-width:var(--max-content-width);margin:0 auto}
+.page-inner{max-width:none;margin:0}
 
-/* responsive sidebar width */
-@media (max-width:980px){:root{--sidebar-width:56px}
-  .sidebar .label{display:none}
+/* responsive tweaks: only adjust content padding on small screens; keep
+   sidebar width consistent to avoid jumping layout */
+@media (max-width:980px){
   .content{padding:12px}
 }
 
@@ -36,6 +35,4 @@ button{font-family:inherit}
 @media (max-width:980px){.columns{grid-template-columns:1fr}}
 
 /* small utilities */
-.row{display:flex;align-items:center;gap:12px}
 .muted{color:var(--muted)}
-*** End Patch

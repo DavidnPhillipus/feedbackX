@@ -1,10 +1,24 @@
 import "./../css/SideBar.css";
 import { NavLink, Outlet } from "react-router-dom";
 import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal } from 'react-icons/fi';
+import { useState } from 'react';
+import SearchModal from "./SearchModal";
+import SmallSideBar from "./SmallSideBar";
+import { useSidebar } from "./SidebarContext";
 
 export default function SideBar() {
+  const { isCompact } = useSidebar();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  if (isCompact) {
+    return <SmallSideBar />;
+  }
+
   return (
     <div className="app-layout">
+      {isSearchOpen ? (
+        <SearchModal onClose={() => setIsSearchOpen(false)} />
+      ) : (
       <aside className="sidebar">
         <h1 className="logo-full">
           feedback<span style={{ color: "blue" }}>X</span>
@@ -17,26 +31,26 @@ export default function SideBar() {
             <FiHome size={20} aria-hidden="true" />
             <span>Home</span>
           </NavLink>
-          <NavLink className="icon" to="/Search" title="Search" aria-label="Search">
+          <button className="icon" type="button" title="Search" aria-label="Search" onClick={() => setIsSearchOpen(true)}>
             <FiSearch size={20} aria-hidden="true" />
             <span>Search</span>
-          </NavLink>
+          </button>
           <NavLink className="icon" to="/Explore" title="Explore" aria-label="Explore">
             <FiCompass size={20} aria-hidden="true" />
             <span>Explore</span>
           </NavLink>
-          <button className="icon" type="button" title="Post" aria-label="Post">
+          <NavLink className="icon" to="/post" title="Post" aria-label="Post">
             <FiPlusSquare size={20} aria-hidden="true" />
             <span>Post</span>
-          </button>
-          <button className="icon" type="button" title="My Projects" aria-label="My Projects">
+          </NavLink>
+          <NavLink className="icon" to="/projects" title="My Projects" aria-label="My Projects">
             <FiFolder size={20} aria-hidden="true" />
             <span>My Projects</span>
-          </button>
-          <button className="icon" type="button" title="Chatroom" aria-label="Chatroom">
+          </NavLink>
+          <NavLink className="icon" to="/feedbackRooms" title="Chatroom" aria-label="Chatroom">
             <FiMessageCircle size={20} aria-hidden="true" />
             <span>Chatroom</span>
-          </button>
+          </NavLink>
           <NavLink className="icon" to="/Profile" title="Profile" aria-label="Profile">
             <FiUser size={20} aria-hidden="true" />
             <span>Profile</span>
@@ -47,6 +61,7 @@ export default function SideBar() {
           </button>
         </div>
       </aside>
+      )}
 
       <main className="content">
         <Outlet />

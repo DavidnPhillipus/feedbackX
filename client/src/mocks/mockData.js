@@ -70,12 +70,42 @@ export const invites = [
     title: "Design Sprint",
     about: "Review Motherboards",
     avatar: "https://i.pravatar.cc/40?img=7",
+    postId: 1,
   },
   {
     id: "i2",
     title: "Beta Testers",
     about: "Help test onboarding",
     avatar: "https://i.pravatar.cc/40?img=8",
+    postId: 2,
+  },
+  {
+    id: "i3",
+    title: "Q1 Planning Meeting",
+    about: "Strategic planning session",
+    avatar: "https://i.pravatar.cc/40?img=9",
+    postId: 3,
+  },
+  {
+    id: "i4",
+    title: "UX Workshop",
+    about: "Learn design systems",
+    avatar: "https://i.pravatar.cc/40?img=10",
+    postId: 4,
+  },
+  {
+    id: "i5",
+    title: "Frontend Meetup",
+    about: "React best practices",
+    avatar: "https://i.pravatar.cc/40?img=11",
+    postId: 5,
+  },
+  {
+    id: "i6",
+    title: "Design feedback session",
+    about: "Review new designs",
+    avatar: "https://i.pravatar.cc/40?img=12",
+    postId: 6,
   },
 ];
 
