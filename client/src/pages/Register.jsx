@@ -1,133 +1,101 @@
-import "./../css/register.css";
-import { FcGoogle } from 'react-icons/fc';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import GoogleSignIn from "../components/GoogleSignIn";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // mock register then navigate to home
-    navigate('/');
+    setError("");
+    setLoading(true);
+    try {
+      await register({ name, username, email, password });
+      navigate("/home", { replace: true });
+    } catch (err) {
+      setError(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div className="outer-container">
-      <div className="form-container">
-        <h1 style={{ fontSize: 36, fontFamily: "ganeva", marginTop: 40 }}>
-          feedback<span style={{ color: "blue" }}>X</span>
+    <div className="fx-auth">
+      <div className="fx-auth__card">
+        <h1 className="fx-auth__logo">
+          feedback<span className="fx-logo__accent">X</span>
         </h1>
-        <h4
-          style={{
-            color: "gray",
-            textAlign: "center",
-            padding: 6,
-            marginTop: 0,
-          }}
-        >
-          Join the feedback revolution - where every opinion fuels innovation
-        </h4>
-        <button className="google">
-          <FcGoogle size={20} style={{ marginRight: 8 }} aria-hidden="true" />
-          Continue with Google
-        </button>
-        <div className="or-container">
-          <div className="line"></div>
-          <span className="or-text">OR</span>
-          <div className="line"></div>
-        </div>
-        <form id="form" onSubmit={handleSubmit}>
+        <p className="fx-auth__tagline">
+          Join the feedback revolution — where every opinion fuels innovation
+        </p>
+        <GoogleSignIn />
+        <div className="fx-auth__divider">OR</div>
+        <form className="fx-auth__form" onSubmit={handleSubmit}>
+          {error && <p className="fx-auth__error">{error}</p>}
           <input
             type="email"
-            placeholder="Email or username"
-            className=" input input-field"
+            placeholder="Email"
+            className="fx-auth__input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
           <input
             type="text"
             placeholder="Full Name"
-            className="input full-name"
-            id="full-name"
+            className="fx-auth__input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
           />
           <input
             type="text"
-            placeholder="Username"
-            className="input username"
-            id="username"
+            placeholder="Username (min 5 chars)"
+            className="fx-auth__input"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            minLength={5}
+            required
           />
           <input
             type="password"
-            placeholder="Password"
-            className="input password"
-            id="password"
+            placeholder="Password (8+ chars, number, special)"
+            className="fx-auth__input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            required
           />
-          <button type="submit" id="reg">
-            Sign Up
+          <button type="submit" className="fx-btn fx-auth__btn" disabled={loading}>
+            {loading ? "Creating account..." : "Sign Up"}
           </button>
         </form>
-        <div className="terms">
-          <p className="text">
-            People who use our service may have uploaded your contact
-            information to Instagram.
-            <span
-              style={{ display: "inline", color: "blue", cursor: "pointer" }}
-            >
-              Learn More
-            </span>
-          </p>
-          <p className="text">
-            By signing up, you agree to our
-            <span
-              style={{
-                display: "inline",
-                color: "blue",
-                cursor: "pointer",
-              }}
-            >
-              Terms , Privacy Policy
-            </span>
-            and
-            <span
-              style={{
-                display: "inline",
-                color: "blue",
-                cursor: "pointer",
-              }}
-            >
-              Cookies Policy.
-            </span>
-          </p>
+        <div className="fx-auth__legal">
+          By signing up, you agree to our Terms, Privacy Policy and Cookies Policy.
         </div>
-      </div>
-      <div className="login-container">
-        <p className="have-account">Have an account?</p>
-        <p className="login" onClick={() => navigate('/Login')}>Login</p>
-      </div>
-      <footer className="footer">
-        <div>
-          <span>
-            feedback<span style={{ color: "blue" }}>X</span>
-          </span>
-          <span className="spn">About</span>
-          <span className="spn">Privacy</span>
-          <span className="spn">Terms</span>
-          <span className="spn">Contact</span>
-          <span className="spn">Help</span>
-        </div>
-        <p className="spn footer-text">
-          &copy; {new Date().getFullYear()} feedback
-          <span style={{ color: "blue", display: "inline" }}>X</span>. All
-          rights reserved.
+        <p className="fx-auth__footer">
+          Have an account?{' '}
+          <button type="button" className="fx-auth__link" onClick={() => navigate('/Login')}>Login</button>
         </p>
+      </div>
+      <footer className="fx-auth__site-footer">
+        <div>
+          feedback<span className="fx-logo__accent">X</span>
+          <span>About</span>
+          <span>Privacy</span>
+          <span>Terms</span>
+          <span>Contact</span>
+          <span>Help</span>
+        </div>
+        <p>&copy; {new Date().getFullYear()} feedbackX. All rights reserved.</p>
       </footer>
     </div>
   );

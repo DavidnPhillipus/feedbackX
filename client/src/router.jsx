@@ -10,33 +10,52 @@ import FeedbackRooms from './pages/FeedbackRooms';
 import Explore from './pages/Explore';
 import PostPage from './pages/Post';
 import MyProjects from './pages/MyProjects';
+import AdminUsers from './pages/AdminUsers';
+import ProtectedRoute, { PublicOnlyRoute } from './components/ProtectedRoute';
 
-import { createBrowserRouter } from 'react-router-dom';
-
-
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 export const router = createBrowserRouter([
-    {
-        path: '/LandingPage', element: <LandingPage />,
-    },
-    {
-        path: '/Register', element: <Register />,
-    },
-    {
-         path: '/Login', element: <Login />,
-    },
-    { element: <SideBar />, children: [
-        {path: '/' , element: <HomePage />},
-        {path: '/post', element: <PostPage />},
-        {path: '/projects', element: <MyProjects />},
-        {path: '/Search', element: <SearchBox />},
-        {path: '/Profile', element: <Profile />},
-        {path: '/Explore', element: <Explore />},
-        {path: '/feedbackRooms', element: <FeedbackRooms />},
-        {path: '/Invites', element: <Invites />},
-    ]},
-
-
-
-   
-])
+  {
+    path: '/',
+    element: <LandingPage />,
+  },
+  {
+    path: '/LandingPage',
+    element: <Navigate to="/" replace />,
+  },
+  {
+    path: '/Register',
+    element: (
+      <PublicOnlyRoute>
+        <Register />
+      </PublicOnlyRoute>
+    ),
+  },
+  {
+    path: '/Login',
+    element: (
+      <PublicOnlyRoute>
+        <Login />
+      </PublicOnlyRoute>
+    ),
+  },
+  {
+    element: (
+      <ProtectedRoute>
+        <SideBar />
+      </ProtectedRoute>
+    ),
+    children: [
+      { path: '/home', element: <HomePage /> },
+      { path: '/post', element: <PostPage /> },
+      { path: '/projects', element: <MyProjects /> },
+      { path: '/Search', element: <SearchBox /> },
+      { path: '/Profile', element: <Profile /> },
+      { path: '/Explore', element: <Explore /> },
+      { path: '/feedbackRooms', element: <FeedbackRooms /> },
+      { path: '/Invites', element: <Invites /> },
+      { path: '/admin/users', element: <AdminUsers /> },
+    ],
+  },
+]);

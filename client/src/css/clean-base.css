@@ -1,38 +1,74 @@
-/* Clean base styles to replace messy globals */
-:root{
-  --bg: #ffffff;
-  --muted: #6b7280;
-  --accent: #1d4ed8;
-  --max-content-width: 1100px;
-  --sidebar-width: 222px;
+:root {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --muted: #64748b;
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+  --border: #e2e8f0;
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+  --radius: 12px;
+  --sidebar-width: 240px;
+  --max-content-width: 1200px;
 }
 
-*{box-sizing:border-box}
-#root{height:100%;margin:0;padding:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color:#0f172a}
-
-a{color:inherit}
-button{font-family:inherit}
-
-/* Utility */
-.container{max-width:none;margin:0;width:100%;}
-
-/* Basic card reset used by templates */
-
-.app-layout{display:flex;min-height:100vh}
-.sidebar{width:222px;flex-shrink:0}
-.content{flex:1;padding:20px;display:flex;justify-content:center}
-.page-wrapper{max-width:800px;width:100%}
-
-/* responsive tweaks: only adjust content padding on small screens; keep
-   sidebar width consistent to avoid jumping layout */
-@media (max-width:980px){
-  .content{padding:12px}
-  .page-wrapper{max-width:none}
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
 }
 
-/* two-column article area used by Home/Explore */
-.columns{display:grid;grid-template-columns:1fr 320px;gap:20px}
-@media (max-width:980px){.columns{grid-template-columns:1fr}}
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+}
 
-/* small utilities */
-.muted{color:var(--muted)}
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 32px;
+  overflow-y: auto;
+}
+
+.page-wrapper {
+  max-width: var(--max-content-width);
+  width: 100%;
+  margin: 0 auto;
+}
+
+.page-inner {
+  width: 100%;
+}
+
+/* Two-column layout: main feed + sidebar panel */
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.columns > main {
+  min-width: 0;
+}
+
+.columns > aside {
+  position: sticky;
+  top: 24px;
+}
+
+@media (max-width: 1024px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
+  .columns > aside {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 16px;
+  }
+}

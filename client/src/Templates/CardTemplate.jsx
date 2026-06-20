@@ -1,58 +1,142 @@
-import "./../css/cardTemplate.css";
 import { useState } from "react";
 
-export default function cardTemplate({
+import { useNavigate } from "react-router-dom";
+
+import * as api from "../services/api";
+
+
+
+export default function CardTemplate({
+
+  id,
+
   category,
+
   username,
+
   profilePicture,
+
   description,
+
   title,
+
   post,
+
   emojis,
+
 }) {
-  const [localEmojis, setLocalEmojis] = useState(emojis);
+
+  const navigate = useNavigate();
+
+  const [localEmojis, setLocalEmojis] = useState(emojis || ["👍"]);
+
+  const [liked, setLiked] = useState(false);
+
+
 
   const emojiCounts = localEmojis.reduce((acc, emoji) => {
+
     acc[emoji] = (acc[emoji] || 0) + 1;
+
     return acc;
+
   }, {});
 
-  const addReaction = (emoji) => {
+
+
+  const addReaction = async (emoji) => {
+
     setLocalEmojis([...localEmojis, emoji]);
+
+    if (!liked && id) {
+
+      try {
+
+        await api.likePost(id);
+
+        setLiked(true);
+
+      } catch {
+
+        /* ignore */
+
+      }
+
+    }
+
   };
 
+
+
+  const giveFeedback = () => {
+
+    navigate("/feedbackRooms");
+
+  };
+
+
+
   return (
-    <div className="card">
-      <div className="card-header">
-        <img src={profilePicture} alt={username} className="card-author-image" />
-        <div className="card-header-content">
-          <div className="card-header-top">
-            <span className="card-author-name">{username}</span>
-            <div className="card-badges">
-              <button className="card-badge">{category}</button>
-              <button className="card-badge">Post</button>
+
+    <article className="fx-card">
+
+      <div className="fx-card__header">
+
+        <img src={profilePicture} alt={username} className="fx-card__avatar" />
+
+        <div className="fx-card__body">
+
+          <div className="fx-card__top">
+
+            <span className="fx-card__author">{username}</span>
+
+            <div className="fx-card__badges">
+
+              <span className="fx-card__badge">{category}</span>
+
+              <span className="fx-card__badge">Post</span>
+
             </div>
-          </div>
-          <h2 className="card-title">{title}</h2>
-          <p className="card-description">{description}</p>
-        </div>
-      </div>
-      <div className="format-part">
-        <div className="format">
-          <img src={post}></img>
-        </div>
-        <div className="reactions">
-          <div className="emojis">
-            {Object.entries(emojiCounts).map(([emoji, count]) => (
-              <button key={emoji} className="emoji" onClick={() => addReaction(emoji)}>
-                {emoji} {count}
-              </button>
-            ))}
+
           </div>
 
-          <button className="feedback-button">Give Feedback</button>
+          <h2 className="fx-card__title">{title}</h2>
+
+          <p className="fx-card__desc">{description}</p>
+
         </div>
+
       </div>
-    </div>
+
+      <div className="fx-card__media">
+
+        <img src={post} alt={title} />
+
+      </div>
+
+      <div className="fx-card__footer">
+
+        <div className="fx-card__reactions">
+
+          {Object.entries(emojiCounts).map(([emoji, count]) => (
+
+            <button key={emoji} type="button" className="fx-card__emoji" onClick={() => addReaction(emoji)}>
+
+              {emoji} {count}
+
+            </button>
+
+          ))}
+
+        </div>
+
+        <button type="button" className="fx-btn" onClick={giveFeedback}>Give Feedback</button>
+
+      </div>
+
+    </article>
+
   );
+
 }
+

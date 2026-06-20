@@ -1,10 +1,15 @@
 import express from 'express';
-import * as repliesController from '../controllers/replies.js';
 
 const router = express.Router();
 
-router.get('/:id', repliesController.getReply);
-router.patch('/:id', repliesController.updateReply);
-router.delete('/:id', repliesController.deleteReply);
+router.get('/:id', (_req, res) => {
+  res.status(501).json({ message: 'Not implemented yet' });
+});
+router.patch('/:id', (_req, res) => {
+  res.status(501).json({ message: 'Not implemented yet' });
+});
+router.delete('/:id', (_req, res) => {
+  res.status(501).json({ message: 'Not implemented yet' });
+});
 
 export default router;

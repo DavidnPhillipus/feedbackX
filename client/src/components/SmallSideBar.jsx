@@ -1,60 +1,73 @@
-import "./../css/SmallSideBar.css";
 import { NavLink } from "react-router-dom";
-import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal } from 'react-icons/fi';
-import { useState } from 'react';
-import SearchModal from "./SearchModal";
 
-export default function SmallSideBar() {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal, FiLogOut } from 'react-icons/fi';
+
+
+
+function NavItem({ to, icon: Icon, label, onClick }) {
+
+  if (onClick) {
+
+    return (
+
+      <button className="fx-nav__item" type="button" title={label} aria-label={label} onClick={onClick}>
+
+        <Icon size={20} />
+
+      </button>
+
+    );
+
+  }
 
   return (
-    <div className="app-layout">
-      {isSearchOpen ? (
-        <SearchModal onClose={() => setIsSearchOpen(false)} />
-      ) : (
-        <div className="sidebar-small">
-          <h1
-            style={{
-              fontSize: 30,
-              fontFamily: "ganeva",
-              marginTop: 30,
-              marginLeft: 15,
-            }}
-          >
-            f<span style={{ color: "blue" }}>X</span>
-          </h1>
-          <div className="icons-container">
-            <NavLink className="icon" to="/" title="Home" aria-label="Home">
-              <FiHome size={18} />
-            </NavLink>
-            <button className="icon" type="button" title="Search" aria-label="Search" onClick={() => setIsSearchOpen(true)}>
-              <FiSearch size={18} />
-            </button>
-            <NavLink className="icon" to="/Explore" title="Explore" aria-label="Explore">
-              <FiCompass size={18} />
-            </NavLink>
-            <NavLink className="icon" to="/post" title="Post" aria-label="Post">
-              <FiPlusSquare size={18} />
-            </NavLink>
-            <NavLink className="icon" to="/projects" title="My Projects" aria-label="My Projects">
-              <FiFolder size={18} />
-            </NavLink>
-            <NavLink className="icon" to="/feedbackRooms" title="Chatroom" aria-label="Chatroom">
-              <FiMessageCircle size={18} />
-            </NavLink>
-            <NavLink className="icon" to="/Profile" title="Profile" aria-label="Profile">
-              <FiUser size={18} />
-            </NavLink>
-            <button className="icon" type="button" title="More" aria-label="More">
-              <FiMoreHorizontal size={18} />
-            </button>
-          </div>
-        </div>
-      )}
 
-      <main className="content">
-        {/* Outlet will be rendered here, but since this is conditional, wait */}
-      </main>
-    </div>
+    <NavLink className={({ isActive }) => `fx-nav__item${isActive ? ' active' : ''}`} to={to} title={label} aria-label={label}>
+
+      <Icon size={20} />
+
+    </NavLink>
+
   );
+
 }
+
+
+
+export default function SmallSideBar({ onSearchOpen, onLogout }) {
+  return (
+
+    <aside className="fx-sidebar fx-sidebar--compact">
+
+      <h1 className="fx-logo">
+
+        f<span className="fx-logo__accent">X</span>
+
+      </h1>
+
+      <nav className="fx-nav">
+
+        <NavItem to="/home" icon={FiHome} label="Home" />
+
+        <NavItem icon={FiSearch} label="Search" onClick={onSearchOpen} />
+
+        <NavItem to="/Explore" icon={FiCompass} label="Explore" />
+
+        <NavItem to="/post" icon={FiPlusSquare} label="Post" />
+
+        <NavItem to="/projects" icon={FiFolder} label="My Projects" />
+
+        <NavItem to="/feedbackRooms" icon={FiMessageCircle} label="Chatroom" />
+
+        <NavItem to="/Profile" icon={FiUser} label="Profile" />
+
+        <NavItem icon={FiLogOut} label="Logout" onClick={onLogout} />
+
+      </nav>
+
+    </aside>
+
+  );
+
+}
+

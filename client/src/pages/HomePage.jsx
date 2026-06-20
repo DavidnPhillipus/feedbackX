@@ -1,114 +1,190 @@
-import "./../css/HomePage.css";
 import CardTemplate from "../Templates/CardTemplate.jsx";
+
 import Activity from "../components/Activity";
+
 import { useEffect, useState, useRef } from "react";
-import { getPosts } from "../services/mockApi";
+
+import * as api from "../services/api";
+
+
 
 export default function HomePage() {
+
   const [items, setItems] = useState([]);
+
   const [page, setPage] = useState(1);
+
   const [loading, setLoading] = useState(false);
+
   const [hasMore, setHasMore] = useState(true);
+
+  const [tab, setTab] = useState("following");
+
   const loadMoreRef = useRef(null);
 
-  // Initial load
-  useEffect(() => {
-    let mounted = true;
-    setLoading(true);
-    getPosts(1, 5)
-      .then((data) => {
-        if (mounted) {
-          setItems(data);
-          setHasMore(data.length >= 5);
-        }
-      })
-      .catch(() => mounted && setItems([]))
-      .finally(() => mounted && setLoading(false));
-    return () => (mounted = false);
-  }, []);
 
-  // Intersection Observer for lazy loading
+
+  const loadPosts = (pageNum, append = false) => {
+
+    setLoading(true);
+
+    return api
+
+      .fetchPosts({ page: pageNum, limit: 5 })
+
+      .then((data) => {
+
+        const posts = data.posts || [];
+
+        setItems((prev) => (append ? [...prev, ...posts] : posts));
+
+        setHasMore(posts.length >= 5);
+
+      })
+
+      .catch(() => {
+
+        if (!append) setItems([]);
+
+        setHasMore(false);
+
+      })
+
+      .finally(() => setLoading(false));
+
+  };
+
+
+
   useEffect(() => {
+
+    setPage(1);
+
+    loadPosts(1, false);
+
+  }, [tab]);
+
+
+
+  useEffect(() => {
+
     if (!hasMore) return;
 
     const observer = new IntersectionObserver(
+
       (entries) => {
+
         if (entries[0].isIntersecting && !loading && hasMore) {
+
           setPage((prev) => prev + 1);
+
         }
+
       },
+
       { threshold: 0.1 }
+
     );
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
 
-    return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
-    };
+    return () => { if (loadMoreRef.current) observer.unobserve(loadMoreRef.current); };
+
   }, [loading, hasMore]);
 
-  // Load more posts when page changes
+
+
   useEffect(() => {
+
     if (page === 1) return;
 
-    let mounted = true;
-    setLoading(true);
-    getPosts(page, 5)
-      .then((data) => {
-        if (mounted) {
-          setItems((prev) => [...prev, ...data]);
-          setHasMore(data.length >= 5);
-        }
-      })
-      .catch(() => mounted && setHasMore(false))
-      .finally(() => mounted && setLoading(false));
-    return () => (mounted = false);
+    loadPosts(page, true);
+
   }, [page]);
 
+
+
   return (
-    <div className="page-inner">
-      <div className="main-header">
-        <span>
+
+    <div className="fx-page">
+
+      <div className="fx-page-header">
+
+        <button
+
+          type="button"
+
+          className={tab === "following" ? "active" : ""}
+
+          onClick={() => setTab("following")}
+
+        >
+
           <strong>Following</strong>
-        </span>
-        <span>Trending now</span>
+
+        </button>
+
+        <button
+
+          type="button"
+
+          className={tab === "trending" ? "active" : ""}
+
+          onClick={() => setTab("trending")}
+
+        >
+
+          Trending now
+
+        </button>
+
       </div>
-      <div className="columns">
+
+      <div className="fx-grid fx-grid--with-aside">
+
         <main>
-          <div className="feed">
+
+          <div className="fx-feed">
+
             {items.length === 0 && loading ? (
-              <p>Loading...</p>
+
+              <p className="fx-muted">Loading...</p>
+
             ) : items.length === 0 ? (
-              <p>No posts yet</p>
+
+              <p className="fx-muted">No posts yet. <a href="/post">Create one!</a></p>
+
             ) : (
-              items.map((p) => (
-                <CardTemplate
-                  key={p.id}
-                  username={p.username}
-                  category={p.category}
-                  title={p.title}
-                  description={p.description}
-                  post={p.post}
-                  profilePicture={p.profilePicture}
-                  emojis={p.emojis}
-                />
-              ))
+
+              items.map((p) => <CardTemplate key={p.id} {...p} />)
+
             )}
+
           </div>
+
           {hasMore && (
-            <div ref={loadMoreRef} className="load-more-trigger">
+
+            <div ref={loadMoreRef} className="fx-load-more">
+
               {loading && <p>Loading more posts...</p>}
+
             </div>
+
           )}
+
         </main>
+
         <aside>
+
           <Activity />
+
         </aside>
+
       </div>
+
     </div>
+
   );
+
 }
+

@@ -1,216 +1,266 @@
-import "../css/ChatRoom.css";
-import { useEffect, useState, useRef } from "react";
-import { getInvites, getPostById, getRoomMessages, postRoomMessage } from "../services/mockApi";
-import { FiUser, FiMoreHorizontal } from 'react-icons/fi';
-import PostModal from "./PostModal";
+import { useEffect, useRef, useState } from "react";
+import {
+  FiSend,
+  FiSettings,
+  FiUsers,
+  FiBell,
+  FiBellOff,
+  FiLogOut,
+  FiX,
+  FiMessageSquare,
+} from "react-icons/fi";
+import { useChat } from "../context/ChatContext";
 
-export default function ChatRoom({ room, onClose }) {
-  const [invites, setInvites] = useState([]);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-  const chatsRef = useRef(null);
-  const fileInputRef = useRef(null);
+function formatTime(ts) {
+  try {
+    return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "";
+  }
+}
+
+function groupMessages(messages) {
+  const groups = [];
+  let current = null;
+
+  for (const msg of messages) {
+    const day = new Date(msg.timestamp).toLocaleDateString();
+    if (!current || current.day !== day) {
+      current = { day, items: [] };
+      groups.push(current);
+    }
+    current.items.push(msg);
+  }
+  return groups;
+}
+
+export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings }) {
+  const {
+    messages,
+    sendMessage,
+    handleTyping,
+    user,
+    onlineUsers,
+    typingUsers,
+    members,
+    leaveRoom,
+    updateDisplayName,
+  } = useChat();
+
+  const [text, setText] = useState("");
+  const [muted, setMuted] = useState(false);
+  const [displayName, setDisplayName] = useState(user.name);
+  const messagesEnd = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
-    let mounted = true;
-    getInvites()
-      .then((data) => {
-        if (mounted) setInvites(data);
-      })
-      .catch(() => {})
-      .finally(() => {});
-    return () => (mounted = false);
-  }, []);
+    messagesEnd.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, typingUsers]);
 
   useEffect(() => {
-    if (!room) return;
-    let mounted = true;
-    // load existing messages for selected room
-    getRoomMessages(room.id).then((msgs) => {
-      if (mounted) setMessages(msgs);
-    });
-    return () => (mounted = false);
+    if (room) inputRef.current?.focus();
   }, [room]);
 
-  // scroll to bottom whenever messages change
-  useEffect(() => {
-    if (chatsRef.current) {
-      chatsRef.current.scrollTop = chatsRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const handleAccept = (inv) => {
-    // simply remove the invite - user chose not to view details
-    setInvites((prev) => prev.filter((i) => i.id !== inv.id));
+  const handleSend = (e) => {
+    e?.preventDefault();
+    if (!text.trim()) return;
+    sendMessage(text);
+    setText("");
   };
 
-  const handleViewInvite = (inv) => {
-    // when user wants to inspect before accepting
-    getPostById(inv.postId).then((post) => {
-      if (post) setSelectedPost(post);
-    });
-  };
+  const othersTyping = typingUsers.filter((u) => u.userId !== user.id);
 
-  const handleDecline = (id) => {
-    setInvites((prev) => prev.filter((i) => i.id !== id));
-  };
+  if (!room) {
+    return (
+      <div className="fx-chatwin__welcome">
+        <div className="fx-chatwin__welcome-inner">
+          <FiMessageSquare size={48} strokeWidth={1.5} />
+          <h2>Your feedback rooms</h2>
+          <p>Select a room from the sidebar to start a real-time conversation with your team.</p>
+          <ul>
+            <li>Live messaging with typing indicators</li>
+            <li>See who's online in each room</li>
+            <li>Create new rooms for your projects</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
 
-  const closeModal = () => setSelectedPost(null);
-
-  const sendMessage = () => {
-    if ((!newMessage.trim() && !fileInputRef.current?.files?.length) || !room) return;
-
-    let msgObj = {
-      sender: "You",
-      text: newMessage.trim(),
-      timestamp: new Date().toISOString(),
-    };
-
-    // handle attached file if any
-    if (fileInputRef.current && fileInputRef.current.files.length > 0) {
-      const file = fileInputRef.current.files[0];
-      const url = URL.createObjectURL(file);
-      msgObj = { ...msgObj, fileUrl: url, fileName: file.name };
-      // clear file input
-      fileInputRef.current.value = null;
-    }
-
-    postRoomMessage(room.id, msgObj).then((m) => {
-      setMessages((prev) => [...prev, m]);
-      setNewMessage("");
-
-      // simulate a reply from another user after a delay
-      setTimeout(() => {
-        const reply = {
-          sender: room.name || "Member",
-          text: "Thanks for the update!",
-          timestamp: new Date().toISOString(),
-        };
-        postRoomMessage(room.id, reply).then((r) => {
-          setMessages((prev) => [...prev, r]);
-        });
-      }, 1000);
-    });
-  };
+  const groups = groupMessages(messages);
 
   return (
-    <div id="chatroom-container">
-      {room ? (
-        <div className="chat-panel">
-          <header className="bar">
-            <div className="room-info">
-              {onClose && (
-                <button className="back-button" onClick={onClose}>
-                  ←
-                </button>
-              )}
-              <div className="room-profile">
-                <img src={room.avatar} alt="room avatar" />
+    <div className="fx-chatwin__main">
+      <header className="fx-chatwin__header">
+        <div className="fx-chatwin__header-info">
+          {onClose && (
+            <button type="button" className="fx-chatwin__back" onClick={onClose} aria-label="Back">
+              ←
+            </button>
+          )}
+          <img src={room.avatar} alt="" className="fx-chatwin__header-avatar" />
+          <div>
+            <h2>{room.name}</h2>
+            <p>
+              {onlineUsers.length > 0
+                ? `${onlineUsers.length} online · ${members.length} members`
+                : `${members.length} members`}
+            </p>
+          </div>
+        </div>
+        <div className="fx-chatwin__header-actions">
+          <button
+            type="button"
+            className={`fx-chatwin__icon-btn${settingsOpen ? " active" : ""}`}
+            onClick={onToggleSettings}
+            title="Room settings"
+          >
+            <FiSettings size={18} />
+          </button>
+        </div>
+      </header>
+
+      <div className="fx-chatwin__body">
+        <div className="fx-chatwin__messages">
+          {groups.map((group) => (
+            <div key={group.day}>
+              <div className="fx-chatwin__date-divider">
+                <span>{group.day}</span>
               </div>
-              <span>{room.name}</span>
-            </div>
-            <div className="room-actions">
-              <button className="icon-button" title="View profile">
-                <FiUser size={20} color="#fff" />
-              </button>
-              <button className="icon-button" title="Settings">
-                <FiMoreHorizontal size={20} color="#fff" />
-              </button>
-            </div>
-          </header>
-          <main className="chats" ref={chatsRef}>
-            {messages.map((m) => (
-              <div key={m.id} className="message">
-                <strong>{m.sender}: </strong>
-                <span>{m.text}</span>
-                {m.fileUrl && (
-                  <div className="attachment">
-                    {m.fileUrl.match(/\.(jpeg|jpg|png|gif)$/i) ? (
-                      <img
-                        src={m.fileUrl}
-                        alt={m.fileName || "attachment"}
-                        className="attachment-img"
-                      />
-                    ) : (
-                      <a href={m.fileUrl} download={m.fileName}>
-                        {m.fileName || "Download file"}
-                      </a>
+              {group.items.map((msg) => {
+                const isOwn = msg.senderId === user.id;
+                return (
+                  <div
+                    key={msg.id}
+                    className={`fx-chatwin__bubble-row${isOwn ? " fx-chatwin__bubble-row--own" : ""}`}
+                  >
+                    {!isOwn && (
+                      <div className="fx-chatwin__bubble-avatar">
+                        {msg.senderName.charAt(0).toUpperCase()}
+                      </div>
                     )}
+                    <div className={`fx-chatwin__bubble${isOwn ? " fx-chatwin__bubble--own" : ""}`}>
+                      {!isOwn && <span className="fx-chatwin__bubble-name">{msg.senderName}</span>}
+                      <p>{msg.text}</p>
+                      <time>{formatTime(msg.timestamp)}</time>
+                    </div>
                   </div>
-                )}
+                );
+              })}
+            </div>
+          ))}
+
+          {othersTyping.length > 0 && (
+            <div className="fx-chatwin__typing">
+              <span className="fx-chatwin__typing-dots">
+                <span /><span /><span />
+              </span>
+              {othersTyping.map((u) => u.userName).join(", ")}{" "}
+              {othersTyping.length === 1 ? "is" : "are"} typing…
+            </div>
+          )}
+          <div ref={messagesEnd} />
+        </div>
+
+        {settingsOpen && (
+          <aside className="fx-chatwin__settings">
+            <div className="fx-chatwin__settings-head">
+              <h3>Room settings</h3>
+              <button type="button" className="fx-chatwin__icon-btn" onClick={onToggleSettings}>
+                <FiX size={18} />
+              </button>
+            </div>
+
+            <div className="fx-chatwin__settings-section">
+              <label htmlFor="display-name">Your display name</label>
+              <div className="fx-chatwin__settings-row">
+                <input
+                  id="display-name"
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="fx-btn"
+                  onClick={() => updateDisplayName(displayName)}
+                >
+                  Save
+                </button>
               </div>
-            ))}
-          </main>
-          <footer className="bottom-bar">
-            <input
-              ref={fileInputRef}
-              type="file"
-              style={{ display: "none" }}
-              onChange={() => {}}
-            />
+            </div>
+
+            <div className="fx-chatwin__settings-section">
+              <h4><FiUsers size={14} /> Members ({members.length})</h4>
+              <ul className="fx-chatwin__member-list">
+                {members.map((m) => (
+                  <li key={m.id}>
+                    <span className="fx-chatwin__member-avatar">{m.name.charAt(0)}</span>
+                    {m.name}
+                    {onlineUsers.some((o) => o.userId === m.id) && (
+                      <span className="fx-chatwin__online-dot" title="Online" />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="fx-chatwin__settings-section">
+              <h4>Notifications</h4>
+              <button
+                type="button"
+                className="fx-chatwin__settings-toggle"
+                onClick={() => setMuted((v) => !v)}
+              >
+                {muted ? <FiBellOff size={16} /> : <FiBell size={16} />}
+                {muted ? "Unmute room" : "Mute room"}
+              </button>
+            </div>
+
+            {room.description && (
+              <div className="fx-chatwin__settings-section">
+                <h4>About</h4>
+                <p className="fx-muted">{room.description}</p>
+              </div>
+            )}
+
             <button
               type="button"
-              className="attach-button"
-              onClick={() => fileInputRef.current?.click()}
+              className="fx-chatwin__leave-btn"
+              onClick={() => {
+                leaveRoom();
+                onClose?.();
+              }}
             >
-              📎
+              <FiLogOut size={16} /> Leave room
             </button>
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message"
-            />
-            <button onClick={sendMessage} className="send-button">
-              Send
-            </button>
-          </footer>
-        </div>
-      ) : (
-        <div className="invite-panel">
-          <h4>Invites</h4>
-          {invites.length === 0 ? (
-            <p>No invitations</p>
-          ) : (
-            invites.map((inv) => (
-              <div key={inv.id} className="invite-details">
-                <div
-                  className="invite-profile clickable"
-                  onClick={() => handleViewInvite(inv)}
-                >
-                  {inv.title ? inv.title.charAt(0) : "?"}
-                </div>
-                <div className="invite-info">
-                  <h4
-                    className="invite-title clickable"
-                    onClick={() => handleViewInvite(inv)}
-                  >
-                    {inv.title}
-                  </h4>
-                  <p className="invite-about"> {inv.about}</p>
-                  <button
-                    className="accept-button"
-                    onClick={() => handleAccept(inv)}
-                  >
-                    Accept
-                  </button>
-                  <button
-                    className="decline-button"
-                    onClick={() => handleDecline(inv.id)}
-                  >
-                    Decline
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
+          </aside>
+        )}
+      </div>
 
-      {selectedPost && (
-        <PostModal post={selectedPost} onClose={closeModal} />
-      )}
+      <footer className="fx-chatwin__composer">
+        <form onSubmit={handleSend}>
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Type a message…"
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              handleTyping();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          />
+          <button type="submit" className="fx-chatwin__send" disabled={!text.trim()}>
+            <FiSend size={18} />
+          </button>
+        </form>
+      </footer>
     </div>
   );
 }

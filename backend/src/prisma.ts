@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import * as env from "dotenv";
+import dotenv from "dotenv";
 
-env.config();
-let prisma = new PrismaClient();
+dotenv.config({ override: true });
+
+const prisma = new PrismaClient();
 
 export default prisma;

@@ -1,43 +1,38 @@
-import "./../css/FeedbackRooms.css";
+import { useState } from "react";
 import ChatsContainer from "../components/ChatsContainer";
 import ChatRoom from "../components/ChatRoom";
-import { useState, useEffect } from "react";
-import { useSidebar } from "../components/SidebarContext";
+import { useChat } from "../context/ChatContext";
 
 export default function FeedbackRooms() {
-  const [activeRoom, setActiveRoom] = useState(null);
-  const { setIsCompact } = useSidebar();
+  const { activeRoom, selectRoom } = useChat();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mobileShowChat, setMobileShowChat] = useState(false);
 
-  useEffect(() => {
-    setIsCompact(!!activeRoom);
-  }, [activeRoom, setIsCompact]);
+  const handleSelect = (room) => {
+    selectRoom(room);
+    setSettingsOpen(false);
+    setMobileShowChat(true);
+  };
 
-  const closeRoom = () => setActiveRoom(null);
+  const handleClose = () => {
+    selectRoom(null);
+    setMobileShowChat(false);
+    setSettingsOpen(false);
+  };
 
   return (
-    // when a room is selected we add a modifier class so the wrapper can
-    // break out of the normal max‑width container and let the chat panel
-    // span the full browser width
-    <div className={`page-inner container${activeRoom ? " full-chat" : ""}`}>
-      {!activeRoom && (
-        <div className="main-header">
-          <span>
-            <strong>Chatrooms</strong>
-          </span>
-          <span>Rooms you joined</span>
-        </div>
-      )}
-
-      <div className={`columns${activeRoom ? " room-active" : ""}`}>
-        {/* chat list always visible on the left of the conversation */}
-        <main className="chat-list">
-          <ChatsContainer onSelect={setActiveRoom} selectedRoom={activeRoom} />
-        </main>
-
-        {/* conversation panel; takes remaining horizontal space */}
-        <aside className="chat-panel-wrapper" style={{ flex: 1, minWidth: 0 }}>
-          <ChatRoom room={activeRoom} onClose={closeRoom} />
-        </aside>
+    <div className="fx-chatwin">
+      <div className={`fx-chatwin__layout${mobileShowChat && activeRoom ? " fx-chatwin__layout--chat" : ""}`}>
+        <ChatsContainer
+          selectedRoom={activeRoom}
+          onSelect={handleSelect}
+        />
+        <ChatRoom
+          room={activeRoom}
+          onClose={handleClose}
+          settingsOpen={settingsOpen}
+          onToggleSettings={() => setSettingsOpen((v) => !v)}
+        />
       </div>
     </div>
   );

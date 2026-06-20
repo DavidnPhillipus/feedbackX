@@ -1,4 +1,3 @@
-import "./../css/Activity.css";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRooms, getInvites } from "../services/mockApi";
@@ -9,59 +8,47 @@ export default function Activity() {
 
   useEffect(() => {
     let mounted = true;
-
-    // load invites and rooms from mock api
-    getInvites()
-      .then((data) => {
-        if (mounted) setInvites(data);
-      })
-      .catch(() => {})
-      .finally(() => {});
-
-    getRooms()
-      .then((data) => {
-        if (mounted) setRooms(data);
-      })
-      .catch(() => {})
-      .finally(() => {});
-
-    return () => {
-      mounted = false;
-    };
+    getInvites().then((data) => mounted && setInvites(data)).catch(() => {});
+    getRooms().then((data) => mounted && setRooms(data)).catch(() => {});
+    return () => { mounted = false; };
   }, []);
 
   const latestInvite = invites[0];
   const latestRoom = rooms[0];
 
   return (
-    <div className="activity-compact">
-      <h3>Activity</h3>
-      <div className="activity-sections">
-        <div className="invites-section">
+    <div className="fx-panel">
+      <h3 className="fx-panel__title">Activity</h3>
+      <div className="fx-panel__sections">
+        <div className="fx-panel__section">
           <h4>Invites</h4>
           {latestInvite && (
-            <div className="latest-item">
-              <div className="item-profile">{latestInvite.title ? latestInvite.title.charAt(0) : "?"}</div>
-              <div className="item-info">
-                <p className="item-title">{latestInvite.title}</p>
-                <p className="item-count">New: {invites.length}</p>
+            <div className="fx-panel__item">
+              <div className="fx-panel__avatar">
+                {latestInvite.title ? latestInvite.title.charAt(0) : "?"}
+              </div>
+              <div>
+                <p className="fx-panel__item-title">{latestInvite.title}</p>
+                <p className="fx-panel__item-meta">New: {invites.length}</p>
               </div>
             </div>
           )}
-          <Link to="/feedbackRooms" className="view-all">View All</Link>
+          <Link to="/feedbackRooms" className="fx-panel__link">View All</Link>
         </div>
-        <div className="feedback-section">
+        <div className="fx-panel__section">
           <h4>Feedback</h4>
           {latestRoom && (
-            <div className="latest-item">
-              <div className="item-profile">{latestRoom.name ? latestRoom.name.charAt(0) : "?"}</div>
-              <div className="item-info">
-                <p className="item-title">{latestRoom.name}</p>
-                <p className="item-count">Total: {rooms.length}</p>
+            <div className="fx-panel__item">
+              <div className="fx-panel__avatar">
+                {latestRoom.name ? latestRoom.name.charAt(0) : "?"}
+              </div>
+              <div>
+                <p className="fx-panel__item-title">{latestRoom.name}</p>
+                <p className="fx-panel__item-meta">Total: {rooms.length}</p>
               </div>
             </div>
           )}
-          <Link to="/feedbackRooms" className="view-all">View All</Link>
+          <Link to="/feedbackRooms" className="fx-panel__link">View All</Link>
         </div>
       </div>
     </div>

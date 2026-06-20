@@ -1,71 +1,130 @@
-import "./../css/MyProjects.css";
 import { useState, useEffect } from "react";
-import { getProjects, getRooms } from "../services/mockApi";
+
+import { useAuth } from "../context/AuthContext";
+
+import * as api from "../services/api";
+
 import ProjectCard from "../Templates/ProjectCard";
+
 import Activity from "../components/Activity";
 
+
+
 export default function MyProjects() {
+
+  const { user } = useAuth();
+
   const [projects, setProjects] = useState([]);
-  const [feedbackRooms, setFeedbackRooms] = useState([]);
+
   const [loadingProjects, setLoadingProjects] = useState(true);
 
-  useEffect(() => {
-    let mounted = true;
-    getProjects()
-      .then((p) => mounted && setProjects(p))
-      .catch(() => mounted && setProjects([]))
-      .finally(() => mounted && setLoadingProjects(false));
-    return () => (mounted = false);
-  }, []);
+
 
   useEffect(() => {
-    let mounted = true;
-    getRooms()
-      .then((r) => mounted && setFeedbackRooms(r))
-      .catch(() => mounted && setFeedbackRooms([]));
-    return () => (mounted = false);
-  }, []);
 
-  // Map unread messages to projects
-  const getUnreadCount = (projectId) => {
-    const room = feedbackRooms.find((r) => r.id === `r${projectId.slice(-1)}`);
-    return room ? room.unread : 0;
-  };
+    if (!user) return;
+
+    api
+
+      .fetchUserPosts(user.id)
+
+      .then((d) => {
+
+        const posts = (d.posts || []).map((p) => ({
+
+          id: p.id,
+
+          title: p.title,
+
+          description: p.body,
+
+          category: JSON.parse(p.tags || "[]")[0] || "General",
+
+          status: p.published ? "Published" : "Draft",
+
+          imageUrl: p.imageUrl,
+
+        }));
+
+        setProjects(posts);
+
+      })
+
+      .catch(() => setProjects([]))
+
+      .finally(() => setLoadingProjects(false));
+
+  }, [user]);
+
+
 
   return (
-    <div className="page-inner container">
-      <div className="columns">
-        <main>
-          <div className="main-header">
-            <span>
-              <strong>My Projects</strong>
-            </span>
-            <span>What you're working on</span>
-          </div>
-          <div className="projects-feed">
-            {loadingProjects ? (
-              <p>Loading projects...</p>
-            ) : projects.length > 0 ? (
-              projects.map((p) => (
-                <ProjectCard
-                  key={p.id}
-                  id={p.id}
-                  title={p.title}
-                  description={p.description}
-                  category={p.category}
-                  status={p.status}
-                  unread={getUnreadCount(p.id)}
-                />
-              ))
-            ) : (
-              <p className="muted">No projects yet</p>
-            )}
-          </div>
-        </main>
-        <aside>
-          <Activity />
-        </aside>
+
+    <div className="fx-page">
+
+      <div className="fx-page-header">
+
+        <span><strong>My Projects</strong></span>
+
+        <span>What you're working on</span>
+
       </div>
+
+      <div className="fx-grid fx-grid--with-aside">
+
+        <main>
+
+          <div className="fx-feed fx-feed--grid">
+
+            {loadingProjects ? (
+
+              <p className="fx-muted">Loading projects...</p>
+
+            ) : projects.length > 0 ? (
+
+              projects.map((p) => (
+
+                <ProjectCard
+
+                  key={p.id}
+
+                  id={p.id}
+
+                  title={p.title}
+
+                  description={p.description}
+
+                  category={p.category}
+
+                  status={p.status}
+
+                  imageUrl={p.imageUrl}
+
+                />
+
+              ))
+
+            ) : (
+
+              <p className="fx-muted">No projects yet. <a href="/post">Create a post!</a></p>
+
+            )}
+
+          </div>
+
+        </main>
+
+        <aside>
+
+          <Activity />
+
+        </aside>
+
+      </div>
+
     </div>
+
   );
+
 }
+

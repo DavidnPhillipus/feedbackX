@@ -1,83 +1,174 @@
-import "./../css/SideBar.css";
-import { NavLink, Outlet } from "react-router-dom";
-import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal } from 'react-icons/fi';
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+
+import { FiHome, FiSearch, FiCompass, FiPlusSquare, FiFolder, FiMessageCircle, FiUser, FiMoreHorizontal, FiMail, FiLogOut, FiUsers } from 'react-icons/fi';
+
 import { useState, useEffect } from 'react';
+
 import SearchModal from "./SearchModal";
+
 import SmallSideBar from "./SmallSideBar";
 
-export default function SideBar() {
-  const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
+import { useAuth } from "../context/AuthContext";
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsCompact(window.innerWidth < 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
-  if (isCompact) {
+
+function NavItem({ to, icon: Icon, label, onClick }) {
+
+  if (onClick) {
+
     return (
-      <div className="app-layout">
-        <SmallSideBar />
-        <main className="content">
-          <div className="page-wrapper">
-            <Outlet />
-          </div>
-        </main>
-      </div>
+
+      <button className="fx-nav__item" type="button" title={label} aria-label={label} onClick={onClick}>
+
+        <Icon size={20} aria-hidden="true" />
+
+        <span className="fx-nav__label">{label}</span>
+
+      </button>
+
     );
+
   }
 
   return (
-    <div className="app-layout">
-      <aside className="sidebar">
-        <h1 className="logo-full">
-          feedback<span style={{ color: "blue" }}>X</span>
-        </h1>
-        <h1 className="logo-compact">
-          f<span style={{ color: "blue" }}>X</span>
-        </h1>
-        <div className="icons-container">
-          <NavLink className="icon" to="/" title="Home" aria-label="Home">
-            <FiHome size={20} aria-hidden="true" />
-            <span>Home</span>
-          </NavLink>
-          <button className="icon" type="button" title="Search" aria-label="Search" onClick={() => setIsCompact(true)}>
-            <FiSearch size={20} aria-hidden="true" />
-            <span>Search</span>
-          </button>
-          <NavLink className="icon" to="/Explore" title="Explore" aria-label="Explore">
-            <FiCompass size={20} aria-hidden="true" />
-            <span>Explore</span>
-          </NavLink>
-          <NavLink className="icon" to="/post" title="Post" aria-label="Post">
-            <FiPlusSquare size={20} aria-hidden="true" />
-            <span>Post</span>
-          </NavLink>
-          <NavLink className="icon" to="/projects" title="My Projects" aria-label="My Projects">
-            <FiFolder size={20} aria-hidden="true" />
-            <span>My Projects</span>
-          </NavLink>
-          <NavLink className="icon" to="/feedbackRooms" title="Chatroom" aria-label="Chatroom">
-            <FiMessageCircle size={20} aria-hidden="true" />
-            <span>Chatroom</span>
-          </NavLink>
-          <NavLink className="icon" to="/Profile" title="Profile" aria-label="Profile">
-            <FiUser size={20} aria-hidden="true" />
-            <span>Profile</span>
-          </NavLink>
-          <button className="icon" type="button" title="More" aria-label="More">
-            <FiMoreHorizontal size={20} aria-hidden="true" />
-            <span>More</span>
-          </button>
-        </div>
-      </aside>
-      <main className="content">
-        <div className="page-wrapper">
-          <Outlet />
-        </div>
-      </main>
-    </div>
+
+    <NavLink className={({ isActive }) => `fx-nav__item${isActive ? ' active' : ''}`} to={to} title={label} aria-label={label}>
+
+      <Icon size={20} aria-hidden="true" />
+
+      <span className="fx-nav__label">{label}</span>
+
+    </NavLink>
+
   );
+
 }
+
+
+
+export default function SideBar() {
+
+  const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
+
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const [showMore, setShowMore] = useState(false);
+
+  const location = useLocation();
+
+  const navigate = useNavigate();
+
+  const { logout, isAdmin } = useAuth();
+
+  const isChatPage = location.pathname === "/feedbackRooms";
+
+
+
+  useEffect(() => {
+
+    const handleResize = () => setIsCompact(window.innerWidth < 768);
+
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+
+  }, []);
+
+
+
+  const handleLogout = () => {
+
+    logout();
+
+    navigate("/");
+
+  };
+
+
+
+  return (
+
+    <div className="fx-app">
+
+      {isCompact ? (
+
+        <SmallSideBar
+
+          onSearchOpen={() => setIsSearchOpen(true)}
+
+          onLogout={handleLogout}
+
+          isAdmin={isAdmin}
+
+        />
+
+      ) : (
+
+        <aside className="fx-sidebar">
+
+          <h1 className="fx-logo">
+
+            feedback<span className="fx-logo__accent">X</span>
+
+          </h1>
+
+          <nav className="fx-nav">
+
+            <NavItem to="/home" icon={FiHome} label="Home" />
+
+            <NavItem icon={FiSearch} label="Search" onClick={() => setIsSearchOpen(true)} />
+
+            <NavItem to="/Explore" icon={FiCompass} label="Explore" />
+
+            <NavItem to="/post" icon={FiPlusSquare} label="Post" />
+
+            <NavItem to="/projects" icon={FiFolder} label="My Projects" />
+
+            <NavItem to="/feedbackRooms" icon={FiMessageCircle} label="Chatroom" />
+
+            <NavItem to="/Invites" icon={FiMail} label="Invites" />
+
+            <NavItem to="/Profile" icon={FiUser} label="Profile" />
+
+            <NavItem icon={FiMoreHorizontal} label="More" onClick={() => setShowMore(!showMore)} />
+
+            {showMore && (
+
+              <div className="fx-nav__more-menu">
+
+                {isAdmin && (
+
+                  <NavItem to="/admin/users" icon={FiUsers} label="Manage Users" />
+
+                )}
+
+                <NavItem icon={FiLogOut} label="Logout" onClick={handleLogout} />
+
+              </div>
+
+            )}
+
+          </nav>
+
+        </aside>
+
+      )}
+
+      <main className={`fx-main${isChatPage ? " fx-main--chat" : ""}`}>
+
+        <div className={`fx-main__container${isChatPage ? " fx-main__container--full" : ""}`}>
+
+          <Outlet />
+
+        </div>
+
+      </main>
+
+      {isSearchOpen && <SearchModal onClose={() => setIsSearchOpen(false)} />}
+
+    </div>
+
+  );
+
+}
+

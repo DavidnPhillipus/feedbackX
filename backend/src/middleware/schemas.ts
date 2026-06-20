@@ -1,5 +1,4 @@
 import z from 'zod';
-import { NotificationSettings, Roles } from '@prisma/client';
 
 const userLazy: z.ZodLazy<any> = z.lazy(() => User);
 const postLazy: z.ZodLazy<any> = z.lazy(() => Post);
@@ -12,8 +11,10 @@ export const User = z.object({
     username: z.string().min(5, 'at least 5 chars').max(50, 'at most 50 chars'),
     password: z.string(),
     verified: z.boolean().optional(),
-    roles: z.nativeEnum(Roles).array().optional(),
-    notificationSettings: z.nativeEnum(NotificationSettings).array().optional(),
+    roles: z.array(z.string()).optional(),
+    bio: z.string().max(500).optional(),
+    avatarUrl: z.string().optional(),
+    notificationSettings: z.array(z.string()).optional(),
     posts: z.array(postLazy).optional(),
     postsLiked: z.array(postLazy).optional(),
     postReplies: z.array(replyLazy).optional(),
@@ -46,12 +47,17 @@ export const Login = User.pick({
     password: true,
 }).strict();
 
+export const GoogleAuth = z.object({
+    credential: z.string().min(1, 'Google credential is required'),
+}).strict();
+
 export const UserUpdate = User.partial().omit({ roles: true }).strict();
 
 export const Post = z.object({
     id: z.number().int().nonnegative().optional(),
     title: z.string().min(10),
     body: z.string().min(10),
+    imageUrl: z.string().optional(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
     userId: z.number().int().nonnegative().optional(),

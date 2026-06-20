@@ -1,62 +1,139 @@
 import { Server, Socket } from "socket.io";
-import prisma from "../prisma";
-import { data } from "react-router-dom";
-import { connect } from "http2";
+import {
+  addMessage,
+  createRoom,
+  getAllRooms,
+  getOnlineInRoom,
+  getRoomMessages,
+  joinRoom,
+  leaveRoom,
+  markRoomRead,
+  onlineUsers,
+} from "../chat/store";
 
 export default function chatSocket(io: Server, socket: Socket) {
-  //create a chat room
-  socket.on("createRoom", async ({ roomName, userId }) => {
-    const room = await prisma.room.create({
-      data: {
-        name: roomName,
-        createdById: userId,
-        members: { connect: { id: userId } }, //Here you are just joining your own room of course
-      },
-    });
-
-    socket.join(`room-${room.id}`); // use Id based channel
-    io.emit("roomCreated", room);
+  socket.on("register", ({ userId, userName }: { userId: string; userName: string }) => {
+    onlineUsers.set(socket.id, { userId, userName });
+    socket.emit("registered", { userId, userName });
+    socket.emit("roomsList", getAllRooms());
   });
 
-  //join a rooom if it's existing of course
-  socket.on("joinRoom", async (roomId, userId) => {
-    const room = await prisma.room.findUnique({
-      where: { id: roomId },
-    });
-    if (!room) return;
-
-    //  Add user to DB
-    await prisma.room.update({
-      where: { id: roomId },
-      data: { members: { connect: { id: userId } } },
-    });
-
-    socket.join(`room-${roomId}`);
-    io.to(`room-${roomId}`).emit("userJoined", { userId, roomId });
+  socket.on("getRooms", () => {
+    socket.emit("roomsList", getAllRooms());
   });
-  socket.on("chatMessage", async (message, userId, roomId) => {
-    const room = await prisma.room.findUnique({
-      where: { id: roomId },
-    });
-    if (!room) return;
-    const msg = await prisma.messeage.create({
-      data: {
+
+  socket.on(
+    "createRoom",
+    ({ roomName, userId, userName }: { roomName: string; userId: string; userName: string }) => {
+      const room = createRoom(roomName, userId, userName);
+      io.emit("roomsList", getAllRooms());
+      socket.emit("roomCreated", room);
+    }
+  );
+
+  socket.on(
+    "joinRoom",
+    ({ roomId, userId, userName }: { roomId: string; userId: string; userName: string }) => {
+      const room = joinRoom(roomId, userId, userName);
+      if (!room) {
+        socket.emit("error", { message: "Room not found" });
+        return;
+      }
+
+      const prev = onlineUsers.get(socket.id);
+      if (prev?.roomId) socket.leave(`room-${prev.roomId}`);
+
+      onlineUsers.set(socket.id, { userId, userName, roomId });
+      socket.join(`room-${roomId}`);
+      markRoomRead(roomId, userId);
+
+      socket.emit("roomJoined", {
         roomId,
-        senderId: userId,
-        content: message,
-      },
+        messages: getRoomMessages(roomId),
+        members: room.members.map((id) => ({
+          id,
+          name: room.memberNames[id] ?? "Member",
+        })),
+        online: getOnlineInRoom(roomId),
+      });
+
+      socket.to(`room-${roomId}`).emit("userJoined", {
+        userId,
+        userName,
+        roomId,
+        online: getOnlineInRoom(roomId),
+      });
+
+      io.emit("roomsList", getAllRooms());
+    }
+  );
+
+  socket.on("leaveRoom", ({ roomId, userId }: { roomId: string; userId: string }) => {
+    leaveRoom(roomId, userId);
+    socket.leave(`room-${roomId}`);
+
+    const user = onlineUsers.get(socket.id);
+    if (user) user.roomId = undefined;
+
+    socket.to(`room-${roomId}`).emit("userLeft", {
+      userId,
+      roomId,
+      online: getOnlineInRoom(roomId),
     });
-    io.to(`room-${roomId}`).emit("chatMessage", msg);
+
+    io.emit("roomsList", getAllRooms());
   });
-  //Accept an invite in real time
-  socket.on("acceptInvite", async ({ code, userId }) => {
-    const invite = await prisma.invite.findUnique({
-      where: { id: userId },
-    });
-    if (!invite) return;
-    await prisma.rooms.update({
-      where: { id: invite.roomId },
-      data: { members: { connect: { id: userId } } },
-    });
+
+  socket.on(
+    "chatMessage",
+    ({
+      roomId,
+      text,
+      userId,
+      userName,
+    }: {
+      roomId: string;
+      text: string;
+      userId: string;
+      userName: string;
+    }) => {
+      const trimmed = text?.trim();
+      if (!trimmed) return;
+
+      const msg = addMessage(roomId, userId, userName, trimmed);
+      if (!msg) return;
+
+      io.to(`room-${roomId}`).emit("chatMessage", msg);
+      io.emit("roomsList", getAllRooms());
+    }
+  );
+
+  socket.on(
+    "typing",
+    ({
+      roomId,
+      userId,
+      userName,
+      isTyping,
+    }: {
+      roomId: string;
+      userId: string;
+      userName: string;
+      isTyping: boolean;
+    }) => {
+      socket.to(`room-${roomId}`).emit("typing", { roomId, userId, userName, isTyping });
+    }
+  );
+
+  socket.on("disconnect", () => {
+    const user = onlineUsers.get(socket.id);
+    if (user?.roomId) {
+      socket.to(`room-${user.roomId}`).emit("userLeft", {
+        userId: user.userId,
+        roomId: user.roomId,
+        online: getOnlineInRoom(user.roomId).filter((u) => u.userId !== user.userId),
+      });
+    }
+    onlineUsers.delete(socket.id);
   });
 }

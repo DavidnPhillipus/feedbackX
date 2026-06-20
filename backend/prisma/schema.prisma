@@ -1,15 +1,96 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  username  String   @unique
+  googleId  String?  @unique
+  roles     String   @default("[]")
+  verified  Boolean  @default(false)
+  avatarUrl String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  password  Password?
+  posts     Post[]
+  likes     PostLike[]
+  follows   PostFollow[]
+  replies   Reply[]
+  sentInvites     Invite[] @relation("Inviter")
+  receivedInvites Invite[] @relation("Invited")
+}
+
+model Password {
+  id     Int    @id @default(autoincrement())
+  hash   String
+  userId Int    @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  body      String
+  imageUrl  String?
+  userId    Int
+  published Boolean  @default(true)
+  tags      String   @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [userId], references: [id])
+  replies   Reply[]
+  likes     PostLike[]
+  followers PostFollow[]
+}
+
+model PostLike {
+  userId Int
+  postId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+}
+
+model PostFollow {
+  userId Int
+  postId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  body      String
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Invite {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  status    String   @default("pending")
+  inviterId Int
+  invitedId Int?
+  roomId    String?
+  title     String?
+  about     String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  inviter   User     @relation("Inviter", fields: [inviterId], references: [id])
+  invited   User?    @relation("Invited", fields: [invitedId], references: [id])
 }

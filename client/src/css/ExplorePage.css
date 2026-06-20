@@ -1,75 +1,79 @@
-.outer-container {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+.explore-page {
   width: 100%;
 }
+
+.search {
+  margin-bottom: 16px;
+}
+
+#search-input {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 10px;
+  width: 100%;
+  border: 1px solid var(--border, #e2e8f0);
+  background: var(--surface, #ffffff);
+  box-shadow: var(--shadow-sm);
+  font-size: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: var(--accent, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
 .categories {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
+  margin-bottom: 20px;
 }
 
 .categories span {
-  padding: 6px 10px;
-  background-color: #f3f4f6;
+  padding: 7px 14px;
+  background-color: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
   font-size: 13px;
+  font-weight: 500;
   border-radius: 9999px;
   cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.categories span:hover {
+  border-color: var(--accent, #2563eb);
+  color: var(--accent, #2563eb);
 }
 
 .categories span.active {
-  background-color: #2563eb;
+  background-color: var(--accent, #2563eb);
+  border-color: var(--accent, #2563eb);
   color: #fff;
-}
-#search-input {
-  display: block;
-  padding: 10px;
-  border-radius: 6px;
-  width: 100%;
-  max-width: 720px;
-  border: solid 1px #d1d5db;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  margin-top: 6px;
-}
-
-.explore-page {
-  min-height: 100vh;
-}
-
-.page-inner {
-  height: 100%;
 }
 
 .feed {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  height: 100%;
-  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
 }
 
 .load-more-trigger {
-  padding: 12px 0;
+  padding: 16px 0;
   text-align: center;
-  margin-top: 12px;
-  width: 100%;
+  grid-column: 1 / -1;
 }
 
 .load-more-trigger p {
   margin: 0;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--muted, #64748b);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }

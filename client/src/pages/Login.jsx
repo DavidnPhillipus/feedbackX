@@ -1,77 +1,85 @@
-import React, { useState } from "react";
-import "./../css/login.css";
-import { FcGoogle } from 'react-icons/fc';
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import GoogleSignIn from "../components/GoogleSignIn";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e) {
+  const from = location.state?.from?.pathname || "/home";
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    // mock auth: navigate to home
-    navigate('/');
+    setError("");
+    setLoading(true);
+    try {
+      await login(username.trim(), password);
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div className="outer-container">
-      <div className="form-container">
-        <h1 style={{ fontSize: 36, fontFamily: "ganeva" }}>
-          feedback<span style={{ color: "blue" }}>X</span>
+    <div className="fx-auth">
+      <div className="fx-auth__card">
+        <h1 className="fx-auth__logo">
+          feedback<span className="fx-logo__accent">X</span>
         </h1>
-        <form className="form" onSubmit={handleSubmit}>
+        <form className="fx-auth__form" onSubmit={handleSubmit}>
+          {error && <p className="fx-auth__error">{error}</p>}
           <input
-            type="email"
+            type="text"
             placeholder="Email or username"
-            className=" input input-field"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            className="fx-auth__input"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
           />
           <input
             type="password"
             placeholder="Password"
-            className="input input-field"
+            className="fx-auth__input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
-          <button type="submit" className="login">
-            Login
+          <button type="submit" className="fx-auth__btn" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
           </button>
-          <div className="or-container">
-            <div className="line"></div>
-            <span className="or-text">OR</span>
-            <div className="line"></div>
-          </div>
-
-          <button type="button" className="google">
-            <FcGoogle size={20} style={{ marginRight: 8 }} aria-hidden="true" />
-            Continue with Google
-          </button>
-          <p className="forgot-password">
-            <span className="forgot">Forgot password?</span>
+          <div className="fx-auth__divider">OR</div>
+          <GoogleSignIn />
+          <p className="fx-auth__footer">
+            <span className="fx-auth__link">Forgot password?</span>
           </p>
         </form>
-      </div>
-      <div className="register-container">
-        <p className="register-text">
-          Don't have an account? <button className="register" onClick={() => navigate('/Register')}>Register</button>
+        <p className="fx-auth__footer">
+          Don't have an account?{' '}
+          <button type="button" className="fx-auth__link" onClick={() => navigate('/Register')}>Register</button>
+        </p>
+        <p className="fx-auth__footer fx-muted" style={{ fontSize: "0.8rem" }}>
+          Demo: demo_user / Demo1234! &nbsp;|&nbsp; Admin: admin / admin369!
         </p>
       </div>
-      <div className="footer-login">
-        <span>
-          feedback<span style={{ color: "blue" }}>X</span>
-        </span>
-        <span className="spn">About</span>
-        <span className="spn">Privacy</span>
-        <span className="spn">Terms</span>
-        <span className="spn">Contact</span>
-        <span className="spn">Help</span>
-      </div>
-      <p className="spn footer-text">
-        &copy; {new Date().getFullYear()} feedback
-        <span style={{ color: "blue" }}>X</span>. All rights reserved.
-      </p>
+      <footer className="fx-auth__site-footer">
+        <div>
+          feedback<span className="fx-logo__accent">X</span>
+          <span>About</span>
+          <span>Privacy</span>
+          <span>Terms</span>
+          <span>Contact</span>
+          <span>Help</span>
+        </div>
+        <p>&copy; {new Date().getFullYear()} feedbackX. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

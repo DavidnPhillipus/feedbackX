@@ -1,54 +1,56 @@
-:root {
-  --icon-compact-width: 66px;
-  --icon-size: 48px;
-  --icon-padding: 0.5rem;
-  --icon-gap: 0.375rem;
-  --icon-margin: 0.25rem;
-  --sidebar-width: 66px;
-}
-
 .sidebar-small {
-  border-right: solid 2px var(--accent, #1d4ed8);
+  background: var(--surface, #ffffff);
+  border-right: 1px solid var(--border, #e2e8f0);
   display: flex;
   flex-direction: column;
   height: 100vh;
   position: sticky;
   top: 0;
-  width: var(--icon-compact-width);
-  padding-top: 0.75rem;
+  width: 72px;
+  padding: 16px 8px;
+  flex-shrink: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
 }
+
+.logo-compact-mobile {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-align: center;
+  margin: 0 0 20px;
+  letter-spacing: -0.5px;
+}
+
+.logo-accent {
+  color: var(--accent, #2563eb);
+}
+
 .icons-container {
   display: flex;
   flex-direction: column;
-  font-family: "Courier New", Courier, monospace;
-  justify-content: flex-start;
   align-items: center;
-  gap: var(--icon-gap);
+  gap: 4px;
 }
+
 .icon {
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: center;
-  font-family: arial;
-  padding: var(--icon-padding);
-  color: #0f172a;
+  padding: 10px;
+  color: #334155;
   text-decoration: none;
-  border-radius: 0.5rem;
-  margin: var(--icon-margin) 0;
-  transition: background-color 120ms ease, color 120ms ease;
-  width: 100%;
-  height: var(--icon-size);
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  width: 48px;
+  height: 48px;
 }
-
-/* keep small sidebar icons fixed size */
 
 .icon:hover,
-.icon:focus {
-  background-color: rgba(30,64,175,0.08);
-  color: #1d4ed8;
-}
-
-img {
-  margin: 8px;
+.icon:focus,
+.icon[aria-current="page"] {
+  background-color: #eff6ff;
+  color: var(--accent, #2563eb);
 }

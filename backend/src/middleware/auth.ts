@@ -1,28 +1,33 @@
-import { RequestHandler } from 'express';
-import jwt from 'jsonwebtoken';
-import env from 'dotenv';
+import { RequestHandler } from "express";
+import jwt from "jsonwebtoken";
+import env from "dotenv";
+import { hasRole } from "../utils/roles.js";
+
 env.config();
 
 const auth: RequestHandler = (req, res, next) => {
-    try {
-        const JWT_SECRET = process.env.JWT_SECRET!;
-        const authHeader = req.headers.authorization!;
-        const token = authHeader.split(' ')[1];
+  try {
+    const JWT_SECRET = process.env.JWT_SECRET!;
+    const authHeader = req.headers.authorization;
 
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-
-        next();
-    } catch (err) {
-        return res.status(401).json({ error: 'Please authenticate' });
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Please authenticate" });
     }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ error: "Please authenticate" });
+  }
 };
 
 export const isAdmin: RequestHandler = (req, res, next) => {
-    if (!req?.user?.roles?.includes('ADMIN')) {
-        return res.status(403).json({ error: "You're not allowed to do this" });
-    }
-    next();
+  if (!hasRole(req?.user?.roles, "ADMIN")) {
+    return res.status(403).json({ error: "You're not allowed to do this" });
+  }
+  next();
 };
 
 export default auth;

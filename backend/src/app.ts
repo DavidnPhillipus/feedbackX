@@ -1,7 +1,11 @@
 import express from "express";
+import cors from "cors";
 import usersRouter from "./routes/users.js";
 import postsRouter from "./routes/posts.js";
 import repliesRouter from "./routes/replies.js";
+import roomsRouter from "./routes/rooms.js";
+import invitesRouter from "./routes/invites.js";
+import uploadRouter from "./routes/upload.js";
 import logging from "./middleware/logging.js";
 import errors from "./middleware/errors.js";
 import xss from "./middleware/xss.js";
@@ -10,29 +14,28 @@ import authRouter from "./routes/auth.js";
 import authenticated from "./middleware/auth.js";
 
 const app = express();
-const port = 8080;
 
-app.use(express.json());
+app.use(cors({ origin: "*" }));
+app.use(express.json({ limit: "15mb" }));
 app.use(xss);
 app.use(logging.logRequest);
 
-app.get("/", (req, res) => {
-  res.json({ message: "hello!" });
+app.get("/", (_req, res) => {
+  res.json({ message: "feedbackX API" });
 });
 
 app.use("/v1/auth", authRouter);
+app.use("/v1/rooms", roomsRouter);
 
-//defaulting to no auth to check db connection easily
-//visit /v1/posts for example
-//uncomment to enable auth
 app.use(authenticated);
 
 app.use("/v1/users", usersRouter);
 app.use("/v1/posts", postsRouter);
 app.use("/v1/replies", repliesRouter);
+app.use("/v1/invites", invitesRouter);
+app.use("/v1/upload", uploadRouter);
+
 app.use(errors.errorHandler);
 app.use(notFound);
 
-app.listen(port, () => {
-  console.log(`App listening http://localhost:${port}.`);
-});
+export default app;

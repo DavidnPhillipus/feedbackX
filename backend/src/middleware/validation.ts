@@ -31,6 +31,7 @@ export const validateBody =
 
 export const createUser = validateBody(schemas.Account);
 export const login = validateBody(schemas.Login);
+export const googleAuth = validateBody(schemas.GoogleAuth);
 export const updateUser = validateBody(schemas.UserUpdate);
 export const updatePost = [validateParamId, validateBody(schemas.PostUpdate)];
 export const createPost = validateBody(schemas.Post);

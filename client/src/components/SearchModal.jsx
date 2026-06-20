@@ -1,113 +1,110 @@
 import { useState, useEffect } from 'react';
 import { FiX, FiSearch } from 'react-icons/fi';
-import './../css/SearchModal.css';
-import { getPosts, getProjects, getRooms } from '../services/mockApi';
+import { useNavigate } from 'react-router-dom';
+import * as api from '../services/api';
+import { fetchRooms } from '../services/socket';
 
 export default function SearchModal({ onClose }) {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [allData, setAllData] = useState([]);
 
-  // Load all data on mount
   useEffect(() => {
     let mounted = true;
     Promise.all([
-      getPosts(1, 50).catch(() => []),
-      getProjects().catch(() => []),
-      getRooms(1, 50).catch(() => []),
-    ]).then(([posts, projects, rooms]) => {
+      api.fetchPosts({ page: 1, limit: 50 }).then((d) => d.posts || []).catch(() => []),
+      fetchRooms().catch(() => []),
+    ]).then(([posts, rooms]) => {
       if (mounted) {
-        const combined = [
-          ...(posts || []).map(p => ({ ...p, type: 'post', searchTitle: p.title, searchSubtitle: p.username })),
-          ...(projects || []).map(p => ({ ...p, type: 'project', searchTitle: p.title, searchSubtitle: 'Your Project' })),
-          ...(rooms || []).map(r => ({ ...r, type: 'room', searchTitle: r.name, searchSubtitle: r.lastMessage })),
-        ];
-        setAllData(combined);
+        setAllData([
+          ...(posts || []).map((p) => ({
+            ...p,
+            type: 'post',
+            searchTitle: p.title,
+            searchSubtitle: p.username,
+          })),
+          ...(rooms || []).map((r) => ({
+            ...r,
+            type: 'room',
+            searchTitle: r.name,
+            searchSubtitle: r.lastMessage || 'Chat room',
+          })),
+        ]);
       }
     });
-
     return () => (mounted = false);
   }, []);
 
-  // Search through data
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
       return;
     }
-
     const searchTerm = query.toLowerCase();
-    const filtered = allData.filter((item) =>
-      item.searchTitle?.toLowerCase().includes(searchTerm) ||
-      item.searchSubtitle?.toLowerCase().includes(searchTerm) ||
-      item.username?.toLowerCase().includes(searchTerm) ||
-      item.description?.toLowerCase().includes(searchTerm)
+    setResults(
+      allData.filter((item) =>
+        item.searchTitle?.toLowerCase().includes(searchTerm) ||
+        item.searchSubtitle?.toLowerCase().includes(searchTerm) ||
+        item.username?.toLowerCase().includes(searchTerm) ||
+        item.description?.toLowerCase().includes(searchTerm)
+      ).slice(0, 12)
     );
-
-    setResults(filtered.slice(0, 12));
   }, [query, allData]);
 
-  const getAvatar = (item) => {
-    if (item.type === 'post') return item.profilePicture;
-    if (item.type === 'room') return item.avatar;
-    return null;
-  };
-
-  const getIcon = (item) => {
-    if (item.type === 'project') return '📋';
-    return null;
+  const handleResultClick = (item) => {
+    onClose();
+    if (item.type === 'room') navigate('/feedbackRooms');
+    else if (item.type === 'post') navigate('/home');
+    else navigate('/projects');
   };
 
   return (
-    <aside className="search-modal">
-      <div className="search-modal-top">
-        <div className="search-modal-title">Search</div>
-        <button className="search-modal-close" onClick={onClose} type="button" title="Close">
-          <FiX size={20} />
-        </button>
-      </div>
-      <div className="search-modal-header">
-        <div className="search-input-wrapper">
+    <div className="fx-search-overlay" onClick={onClose}>
+      <aside className="fx-search-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="fx-search-modal__top">
+          <div className="fx-search-modal__title">Search</div>
+          <button className="fx-search-modal__close" onClick={onClose} type="button" title="Close">
+            <FiX size={20} />
+          </button>
+        </div>
+        <div className="fx-search-modal__input-wrap">
           <FiSearch size={16} />
           <input
             type="text"
-            placeholder="Search"
-            className="search-input"
+            placeholder="Search posts, projects, rooms..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
           />
         </div>
-      </div>
-
-      <div className="search-modal-content">
-        {query.trim() === '' ? (
-          <div className="search-empty">
-            <p>Search posts, projects, and more</p>
-          </div>
-        ) : results.length === 0 ? (
-          <div className="search-empty">
-            <p>No results found</p>
-          </div>
-        ) : (
-          <div className="search-results-list">
-            {results.map((item) => (
-              <div key={`${item.type}-${item.id}`} className="search-result-item">
-                {getAvatar(item) ? (
-                  <img src={getAvatar(item)} alt={item.searchTitle} className="search-result-avatar" />
+        <div className="fx-search-modal__content">
+          {!query.trim() ? (
+            <div className="fx-search-empty"><p>Search posts, projects, and more</p></div>
+          ) : results.length === 0 ? (
+            <div className="fx-search-empty"><p>No results found</p></div>
+          ) : (
+            results.map((item) => (
+              <button
+                key={`${item.type}-${item.id}`}
+                type="button"
+                className="fx-search-result"
+                onClick={() => handleResultClick(item)}
+              >
+                {item.type === 'post' || item.type === 'room' ? (
+                  <img src={item.profilePicture || item.avatar} alt="" className="fx-search-result__avatar" />
                 ) : (
-                  <div className="search-result-icon">{getIcon(item)}</div>
+                  <div className="fx-search-result__icon">📋</div>
                 )}
-                <div className="search-result-info">
-                  <p className="search-result-title">{item.searchTitle}</p>
-                  <p className="search-result-subtitle">{item.searchSubtitle}</p>
+                <div>
+                  <p className="fx-search-result__title">{item.searchTitle}</p>
+                  <p className="fx-search-result__subtitle">{item.searchSubtitle}</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </aside>
+              </button>
+            ))
+          )}
+        </div>
+      </aside>
+    </div>
   );
 }
-
