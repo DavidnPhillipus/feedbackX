@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import type { RequestHandler } from 'express';
 
 const notFound: RequestHandler = (req, res, next) => {
     return res

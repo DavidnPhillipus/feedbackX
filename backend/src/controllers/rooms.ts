@@ -5,6 +5,7 @@ import {
   getAllRooms,
   getOnlineInRoom,
   getRoomMessages,
+  hydrateRoomMessages,
   joinRoom,
   leaveRoom,
   markRoomRead,
@@ -13,7 +14,7 @@ import {
 
 export default function chatSocket(io: Server, socket: Socket) {
   socket.on("register", ({ userId, userName }: { userId: string; userName: string }) => {
-    onlineUsers.set(socket.id, { userId, userName });
+    onlineUsers.set(socket.id, { userId, userName, roomId: undefined });
     socket.emit("registered", { userId, userName });
     socket.emit("roomsList", getAllRooms());
   });
@@ -33,10 +34,14 @@ export default function chatSocket(io: Server, socket: Socket) {
 
   socket.on(
     "joinRoom",
-    ({ roomId, userId, userName }: { roomId: string; userId: string; userName: string }) => {
+    async (
+      { roomId, userId, userName }: { roomId: string; userId: string; userName: string },
+      callback?: (payload: unknown) => void
+    ) => {
       const room = joinRoom(roomId, userId, userName);
       if (!room) {
         socket.emit("error", { message: "Room not found" });
+        callback?.({ error: "Room not found" });
         return;
       }
 
@@ -47,7 +52,9 @@ export default function chatSocket(io: Server, socket: Socket) {
       socket.join(`room-${roomId}`);
       markRoomRead(roomId, userId);
 
-      socket.emit("roomJoined", {
+      await hydrateRoomMessages(roomId);
+
+      const payload = {
         roomId,
         messages: getRoomMessages(roomId),
         members: room.members.map((id) => ({
@@ -55,7 +62,10 @@ export default function chatSocket(io: Server, socket: Socket) {
           name: room.memberNames[id] ?? "Member",
         })),
         online: getOnlineInRoom(roomId),
-      });
+      };
+
+      socket.emit("roomJoined", payload);
+      callback?.(payload);
 
       socket.to(`room-${roomId}`).emit("userJoined", {
         userId,
@@ -86,25 +96,37 @@ export default function chatSocket(io: Server, socket: Socket) {
 
   socket.on(
     "chatMessage",
-    ({
-      roomId,
-      text,
-      userId,
-      userName,
-    }: {
-      roomId: string;
-      text: string;
-      userId: string;
-      userName: string;
-    }) => {
-      const trimmed = text?.trim();
-      if (!trimmed) return;
-
-      const msg = addMessage(roomId, userId, userName, trimmed);
+    async (
+      {
+        roomId,
+        text,
+        userId,
+        userName,
+        attachmentUrl,
+        attachmentName,
+        attachmentType,
+      }: {
+        roomId: string;
+        text: string;
+        userId: string;
+        userName: string;
+        attachmentUrl?: string;
+        attachmentName?: string;
+        attachmentType?: string;
+      },
+      callback?: (msg: unknown) => void
+    ) => {
+      const attachmentPayload = {
+        ...(attachmentUrl ? { url: attachmentUrl } : {}),
+        ...(attachmentName ? { name: attachmentName } : {}),
+        ...(attachmentType ? { type: attachmentType } : {}),
+      };
+      const msg = await addMessage(roomId, userId, userName, text, attachmentPayload);
       if (!msg) return;
 
       io.to(`room-${roomId}`).emit("chatMessage", msg);
       io.emit("roomsList", getAllRooms());
+      callback?.(msg);
     }
   );
 

@@ -20,9 +20,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   password  Password?
+  passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
   posts     Post[]
   likes     PostLike[]
   follows   PostFollow[]
+  following UserFollow[] @relation("UserFollowing")
+  followers UserFollow[] @relation("UserFollowers")
   replies   Reply[]
   sentInvites     Invite[] @relation("Inviter")
   receivedInvites Invite[] @relation("Invited")
@@ -35,27 +39,54 @@ model Password {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Post {
+model PasswordResetToken {
   id        Int      @id @default(autoincrement())
-  title     String
-  body      String
-  imageUrl  String?
+  token     String   @unique
   userId    Int
-  published Boolean  @default(true)
-  tags      String   @default("[]")
+  expiresAt DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [userId], references: [id])
-  replies   Reply[]
-  likes     PostLike[]
-  followers PostFollow[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Post {
+  id              Int      @id @default(autoincrement())
+  title           String
+  body            String
+  imageUrl        String?
+  attachmentUrl   String?
+  attachmentType  String?
+  attachmentName  String?
+  userId          Int
+  published       Boolean  @default(true)
+  tags            String   @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  author          User     @relation(fields: [userId], references: [id])
+  replies         Reply[]
+  likes           PostLike[]
+  followers       PostFollow[]
 }
 
 model PostLike {
-  userId Int
-  postId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    Int
+  postId    Int
+  emoji     String   @default("👍")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
 }
@@ -67,6 +98,17 @@ model PostFollow {
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
+}
+
+model UserFollow {
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+  follower    User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
 }
 
 model Reply {
@@ -93,4 +135,18 @@ model Invite {
   createdAt DateTime @default(now())
   inviter   User     @relation("Inviter", fields: [inviterId], references: [id])
   invited   User?    @relation("Invited", fields: [invitedId], references: [id])
+}
+
+model ChatMessage {
+  id             String   @id
+  roomId         String
+  senderId       String
+  senderName     String
+  text           String   @default("")
+  attachmentUrl  String?
+  attachmentName String?
+  attachmentType String?
+  createdAt      DateTime @default(now())
+
+  @@index([roomId, createdAt])
 }

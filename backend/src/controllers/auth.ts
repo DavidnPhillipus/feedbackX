@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 import prisma from "../prisma.js";
 import env from "dotenv";
 import * as bcrypt from "bcrypt";
-import { OAuth2Client } from "google-auth-library";
 import { parseRoles, stringifyRoles } from "../utils/roles.js";
+import { buildResetUrl, createPasswordResetToken } from "../utils/passwordReset.js";
+import { isEmailConfigured, sendPasswordResetEmail } from "../utils/mail.js";
 
 env.config();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 function publicUser(user: {
   id: number;
@@ -17,6 +17,7 @@ function publicUser(user: {
   email: string;
   name: string;
   roles: string;
+  verified?: boolean;
   avatarUrl?: string | null;
   bio?: string | null;
 }) {
@@ -26,25 +27,10 @@ function publicUser(user: {
     email: user.email,
     name: user.name,
     roles: parseRoles(user.roles),
+    verified: user.verified ?? false,
     avatarUrl: user.avatarUrl,
     bio: user.bio,
   };
-}
-
-async function uniqueUsername(email: string): Promise<string> {
-  const raw = email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "").toLowerCase();
-  let base = raw.length >= 5 ? raw.slice(0, 40) : `user_${raw}`;
-  if (base.length < 5) {
-    base = `user_${Date.now().toString(36).slice(-6)}`;
-  }
-
-  let username = base;
-  let suffix = 1;
-  while (await prisma.user.findUnique({ where: { username } })) {
-    username = `${base.slice(0, 44)}${suffix}`;
-    suffix += 1;
-  }
-  return username;
 }
 
 function issueToken(user: { id: number; username: string; roles: string }) {
@@ -70,9 +56,7 @@ export const login: RequestHandler = async (req, res) => {
   }
 
   if (!user.password?.hash) {
-    return res.status(401).json({
-      message: "This account uses Google sign-in. Continue with Google instead.",
-    });
+    return res.status(401).json({ message: "Invalid username or email" });
   }
 
   const passwordValid = await bcrypt.compare(password, user.password.hash);
@@ -89,9 +73,10 @@ export const register: RequestHandler = async (req, res) => {
   const { name, username, email, password } = req.body;
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
+  const normalizedEmail = email.trim().toLowerCase();
 
   const existing = await prisma.user.findFirst({
-    where: { OR: [{ username }, { email }] },
+    where: { OR: [{ username }, { email: normalizedEmail }] },
   });
 
   if (existing) {
@@ -107,7 +92,8 @@ export const register: RequestHandler = async (req, res) => {
     data: {
       name,
       username,
-      email,
+      email: normalizedEmail,
+      verified: true,
       roles: stringifyRoles(["USER"]),
       password: {
         create: { hash: hashedPassword },
@@ -115,70 +101,73 @@ export const register: RequestHandler = async (req, res) => {
     },
   });
 
-  const token = issueToken(user);
-  res.status(201).json({ token, user: publicUser(user) });
+  res.status(201).json({
+    message: "Account created. Please log in.",
+    email: user.email,
+  });
 };
 
-export const googleAuth: RequestHandler = async (req, res) => {
-  const { credential } = req.body;
+const RESET_SUCCESS_MESSAGE =
+  "If an account with that email exists, we've sent password reset instructions.";
 
-  if (!GOOGLE_CLIENT_ID) {
-    return res.status(503).json({ message: "Google sign-in is not configured on the server" });
-  }
+export const forgotPassword: RequestHandler = async (req, res) => {
+  const { email } = req.body;
+  const normalizedEmail = email.trim().toLowerCase();
 
-  const client = new OAuth2Client(GOOGLE_CLIENT_ID);
-  let payload;
-
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: GOOGLE_CLIENT_ID,
-    });
-    payload = ticket.getPayload();
-  } catch {
-    return res.status(401).json({ message: "Invalid or expired Google sign-in" });
-  }
-
-  if (!payload?.email || !payload.sub) {
-    return res.status(400).json({ message: "Google account is missing required profile info" });
-  }
-
-  const googleId = payload.sub;
-  const email = payload.email.toLowerCase();
-  const name = payload.name || email.split("@")[0];
-  const avatarUrl = payload.picture || null;
-
-  let user = await prisma.user.findFirst({
-    where: { OR: [{ googleId }, { email }] },
+  const user = await prisma.user.findFirst({
+    where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    include: { password: true },
   });
 
-  if (user) {
-    user = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        googleId: user.googleId || googleId,
-        verified: true,
-        name: user.name || name,
-        avatarUrl: user.avatarUrl || avatarUrl,
-      },
-    });
-  } else {
-    const username = await uniqueUsername(email);
-    user = await prisma.user.create({
-      data: {
-        email,
-        name,
-        username,
-        googleId,
-        avatarUrl,
-        verified: true,
-        roles: stringifyRoles(["USER"]),
-      },
-    });
+  if (!user?.password?.hash) {
+    return res.json({ message: RESET_SUCCESS_MESSAGE });
   }
 
-  const token = issueToken(user);
-  res.json({ token, user: publicUser(user) });
+  const token = await createPasswordResetToken(user.id);
+  const resetUrl = buildResetUrl(token);
+
+  try {
+    await sendPasswordResetEmail(user.email, resetUrl);
+  } catch (err) {
+    console.error("Failed to send password reset email:", err);
+    return res.status(500).json({ message: "Could not send reset email. Try again later." });
+  }
+
+  const payload: { message: string; resetUrl?: string } = { message: RESET_SUCCESS_MESSAGE };
+  if (!isEmailConfigured()) {
+    payload.resetUrl = resetUrl;
+  }
+
+  res.json(payload);
+};
+
+export const resetPassword: RequestHandler = async (req, res) => {
+  const { token, password } = req.body;
+
+  const resetToken = await prisma.passwordResetToken.findUnique({
+    where: { token },
+    include: { user: { include: { password: true } } },
+  });
+
+  if (!resetToken || resetToken.expiresAt < new Date()) {
+    if (resetToken) {
+      await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
+    }
+    return res.status(400).json({ message: "Invalid or expired reset link" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await prisma.$transaction([
+    prisma.password.upsert({
+      where: { userId: resetToken.userId },
+      create: { userId: resetToken.userId, hash: hashedPassword },
+      update: { hash: hashedPassword },
+    }),
+    prisma.passwordResetToken.deleteMany({ where: { userId: resetToken.userId } }),
+  ]);
+
+  res.json({ message: "Password updated. You can log in with your new password." });
 };
 
 export const me: RequestHandler = async (req, res) => {
@@ -191,6 +180,12 @@ export const me: RequestHandler = async (req, res) => {
   }
 
   const postCount = await prisma.post.count({ where: { userId: user.id } });
+  const [followerCount, followingCount] = await Promise.all([
+    prisma.userFollow.count({ where: { followingId: user.id } }),
+    prisma.userFollow.count({ where: { followerId: user.id } }),
+  ]);
 
-  res.json({ user: { ...publicUser(user), postCount } });
+  res.json({
+    user: { ...publicUser(user), postCount, followerCount, followingCount },
+  });
 };

@@ -7,6 +7,7 @@ const router = express.Router();
 router.get('/', postsController.getPosts);
 router.post('/', validation.createPost, postsController.createPost);
 
+router.get('/:id/feedback-room', postsController.getPostFeedbackRoom);
 router.get('/:id', postsController.getPost);
 router.patch('/:id', validation.updatePost, postsController.updatePost);
 router.delete('/:id', postsController.deletePost);

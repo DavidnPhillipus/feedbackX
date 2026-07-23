@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { getStoredUser } from "./api";
+import { apiUrl, getStoredUser } from "./api";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "";
 
@@ -27,11 +27,36 @@ export function disconnectSocket() {
 
 const USER_KEY = "fx-chat-user";
 
+export function toChatUserId(authUserId) {
+  if (authUserId == null || authUserId === "") return "u-guest";
+  const raw = String(authUserId);
+  return raw.startsWith("u-") ? raw : `u-${raw}`;
+}
+
+export function isSameChatUser(a, b) {
+  if (!a || !b) return false;
+  return toChatUserId(a) === toChatUserId(b);
+}
+
+export function syncChatUserFromAuth() {
+  const authUser = getStoredUser();
+  if (!authUser) {
+    return getChatUser();
+  }
+
+  const chatUser = {
+    id: toChatUserId(authUser.id),
+    name: authUser.name || authUser.username,
+  };
+  localStorage.setItem(USER_KEY, JSON.stringify(chatUser));
+  return chatUser;
+}
+
 export function getChatUser() {
   const authUser = getStoredUser();
   if (authUser) {
     const chatUser = {
-      id: `u-${authUser.id}`,
+      id: toChatUserId(authUser.id),
       name: authUser.name || authUser.username,
     };
     localStorage.setItem(USER_KEY, JSON.stringify(chatUser));
@@ -61,9 +86,20 @@ export function setChatUserName(name) {
   return user;
 }
 
+export function clearChatUser() {
+  localStorage.removeItem(USER_KEY);
+}
+
 export async function fetchRooms() {
-  const res = await fetch("/v1/rooms");
+  const res = await fetch(apiUrl("/rooms"));
   if (!res.ok) throw new Error("Failed to load rooms");
   const data = await res.json();
   return data.rooms ?? [];
+}
+
+export async function fetchRoomMessages(roomId) {
+  const res = await fetch(apiUrl(`/rooms/${encodeURIComponent(roomId)}/messages`));
+  if (!res.ok) throw new Error("Failed to load messages");
+  const data = await res.json();
+  return data.messages ?? [];
 }

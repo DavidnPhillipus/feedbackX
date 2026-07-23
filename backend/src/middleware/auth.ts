@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import env from "dotenv";
 import { hasRole } from "../utils/roles.js";
@@ -7,7 +7,10 @@ env.config();
 
 const auth: RequestHandler = (req, res, next) => {
   try {
-    const JWT_SECRET = process.env.JWT_SECRET!;
+    const JWT_SECRET = process.env.JWT_SECRET;
+    if (!JWT_SECRET) {
+      throw new Error("Missing JWT secret");
+    }
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
@@ -15,7 +18,10 @@ const auth: RequestHandler = (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!token) {
+      return res.status(401).json({ error: "Please authenticate" });
+    }
+    const decoded = jwt.verify(token, JWT_SECRET) as Record<string, unknown>;
     req.user = decoded;
     next();
   } catch {

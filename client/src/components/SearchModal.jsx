@@ -3,6 +3,7 @@ import { FiX, FiSearch } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import * as api from '../services/api';
 import { fetchRooms } from '../services/socket';
+import UserAvatar from './UserAvatar';
 
 export default function SearchModal({ onClose }) {
   const navigate = useNavigate();
@@ -91,8 +92,20 @@ export default function SearchModal({ onClose }) {
                 className="fx-search-result"
                 onClick={() => handleResultClick(item)}
               >
-                {item.type === 'post' || item.type === 'room' ? (
-                  <img src={item.profilePicture || item.avatar} alt="" className="fx-search-result__avatar" />
+                {item.type === 'post' ? (
+                  <UserAvatar
+                    src={item.profilePicture}
+                    name={item.username}
+                    username={item.authorUsername}
+                    size={40}
+                    className="fx-search-result__avatar"
+                  />
+                ) : item.type === 'room' ? (
+                  item.avatar ? (
+                    <img src={item.avatar} alt="" className="fx-search-result__avatar" />
+                  ) : (
+                    <UserAvatar name={item.searchTitle} size={40} className="fx-search-result__avatar" />
+                  )
                 ) : (
                   <div className="fx-search-result__icon">📋</div>
                 )}

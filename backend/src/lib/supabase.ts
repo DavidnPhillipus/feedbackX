@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import env from "dotenv";
 
-env.config({ override: true });
+env.config();
 
 const url = process.env.SUPABASE_URL;
 const key = process.env.SUPABASE_ANON_KEY;

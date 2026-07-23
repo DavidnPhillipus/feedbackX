@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import type { RequestHandler } from 'express';
 import z, { ZodType } from 'zod';
 import * as schemas from './schemas.js';
 import { ValidationError } from './errors.js';
@@ -8,7 +8,7 @@ export const validateParamId: RequestHandler = (req, res, next) => {
         .number()
         .int()
         .nonnegative()
-        .safeParse(parseInt(req.params.id));
+        .safeParse(parseInt(String(req.params.id), 10));
 
     if (!result.success) {
         return next(new ValidationError(result.error.issues));
@@ -31,7 +31,8 @@ export const validateBody =
 
 export const createUser = validateBody(schemas.Account);
 export const login = validateBody(schemas.Login);
-export const googleAuth = validateBody(schemas.GoogleAuth);
+export const forgotPassword = validateBody(schemas.ForgotPassword);
+export const resetPassword = validateBody(schemas.ResetPassword);
 export const updateUser = validateBody(schemas.UserUpdate);
 export const updatePost = [validateParamId, validateBody(schemas.PostUpdate)];
 export const createPost = validateBody(schemas.Post);

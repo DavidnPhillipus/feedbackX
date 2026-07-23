@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import GoogleSignIn from "../components/GoogleSignIn";
+import * as api from "../services/api";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register } = useAuth();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -18,8 +16,11 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      await register({ name, username, email, password });
-      navigate("/home", { replace: true });
+      const data = await api.register({ name, username, email, password });
+      navigate("/Login", {
+        replace: true,
+        state: { message: data.message },
+      });
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
@@ -36,8 +37,6 @@ export default function Register() {
         <p className="fx-auth__tagline">
           Join the feedback revolution — where every opinion fuels innovation
         </p>
-        <GoogleSignIn />
-        <div className="fx-auth__divider">OR</div>
         <form className="fx-auth__form" onSubmit={handleSubmit}>
           {error && <p className="fx-auth__error">{error}</p>}
           <input

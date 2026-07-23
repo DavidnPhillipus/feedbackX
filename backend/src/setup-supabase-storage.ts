@@ -6,8 +6,19 @@ VALUES (
   'post-images',
   'post-images',
   true,
-  10485760,
-  ARRAY['image/jpeg','image/png','image/gif','image/webp']
+  52428800,
+  ARRAY[
+    'image/jpeg','image/png','image/gif','image/webp',
+    'video/mp4','video/webm','video/quicktime',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'text/plain'
+  ]
 )
 ON CONFLICT (id) DO UPDATE SET
   public = EXCLUDED.public,

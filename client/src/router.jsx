@@ -3,6 +3,8 @@ import HomePage from './pages/HomePage';
 import Profile from './pages/Profile';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import SideBar from './components/SideBar';
 import SearchBox from './components/SearchBox';
 import Invites from './pages/Invites';
@@ -10,6 +12,8 @@ import FeedbackRooms from './pages/FeedbackRooms';
 import Explore from './pages/Explore';
 import PostPage from './pages/Post';
 import MyProjects from './pages/MyProjects';
+import Creators from './pages/Creators';
+import CreatorProfile from './pages/CreatorProfile';
 import AdminUsers from './pages/AdminUsers';
 import ProtectedRoute, { PublicOnlyRoute } from './components/ProtectedRoute';
 
@@ -41,6 +45,22 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/ForgotPassword',
+    element: (
+      <PublicOnlyRoute>
+        <ForgotPassword />
+      </PublicOnlyRoute>
+    ),
+  },
+  {
+    path: '/ResetPassword',
+    element: (
+      <PublicOnlyRoute>
+        <ResetPassword />
+      </PublicOnlyRoute>
+    ),
+  },
+  {
     element: (
       <ProtectedRoute>
         <SideBar />
@@ -53,6 +73,8 @@ export const router = createBrowserRouter([
       { path: '/Search', element: <SearchBox /> },
       { path: '/Profile', element: <Profile /> },
       { path: '/Explore', element: <Explore /> },
+      { path: '/creators', element: <Creators /> },
+      { path: '/creators/:id', element: <CreatorProfile /> },
       { path: '/feedbackRooms', element: <FeedbackRooms /> },
       { path: '/Invites', element: <Invites /> },
       { path: '/admin/users', element: <AdminUsers /> },

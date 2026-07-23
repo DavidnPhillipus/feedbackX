@@ -13,9 +13,22 @@ export default function AdminUsers() {
       setLoading(false);
       return;
     }
-    api
-      .fetchUsers()
-      .then((d) => setUsers(d.users || []))
+
+    async function loadAllUsers() {
+      let page = 1;
+      let all = [];
+      let hasMore = true;
+      while (hasMore) {
+        const data = await api.fetchUsers({ page, limit: 30 });
+        all = [...all, ...(data.users || [])];
+        hasMore = Boolean(data.hasMore);
+        page += 1;
+      }
+      return all;
+    }
+
+    loadAllUsers()
+      .then(setUsers)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [isAdmin]);

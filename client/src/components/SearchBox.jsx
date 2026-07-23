@@ -1,6 +1,6 @@
 import SearchTemplate from "../Templates/SearchTemplate";
 import { useState, useEffect, useRef } from "react";
-import { getPosts } from "../services/mockApi";
+import * as api from "../services/api";
 
 export default function SearchBox() {
   const [query, setQuery] = useState("");
@@ -9,28 +9,20 @@ export default function SearchBox() {
   const timer = useRef(null);
 
   useEffect(() => {
-    let mounted = true;
-    getPosts().then((items) => mounted && setResults(items || [])).catch(() => mounted && setResults([]));
-    return () => (mounted = false);
-  }, []);
-
-  useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       setLoading(true);
-      getPosts()
-        .then((items) => {
-          const q = (query || "").trim().toLowerCase();
-          if (!q) return setResults(items || []);
-          setResults((items || []).filter((it) => {
-            const title = (it.title || it.username || "").toString().toLowerCase();
-            return title.includes(q);
-          }));
-        })
+      const search = query.trim() || undefined;
+      api
+        .fetchPosts({ page: 1, limit: 50, search })
+        .then((data) => setResults(data.posts || []))
         .catch(() => setResults([]))
         .finally(() => setLoading(false));
     }, 300);
-    return () => { if (timer.current) clearTimeout(timer.current); };
+
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
   }, [query]);
 
   return (
@@ -49,6 +41,8 @@ export default function SearchBox() {
         <div className="fx-search-page__results">
           {loading ? (
             <p className="fx-muted" style={{ padding: 16 }}>Searching...</p>
+          ) : results.length === 0 ? (
+            <p className="fx-muted" style={{ padding: 16 }}>No posts found</p>
           ) : (
             results.map((item) => (
               <SearchTemplate item={item} key={item.id} />

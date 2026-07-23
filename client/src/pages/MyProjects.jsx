@@ -5,8 +5,8 @@ import { useAuth } from "../context/AuthContext";
 import * as api from "../services/api";
 
 import ProjectCard from "../Templates/ProjectCard";
-
 import Activity from "../components/Activity";
+import { getMediaKind } from "../utils/fileTypes";
 
 
 
@@ -31,19 +31,16 @@ export default function MyProjects() {
       .then((d) => {
 
         const posts = (d.posts || []).map((p) => ({
-
           id: p.id,
-
           title: p.title,
-
           description: p.body,
-
           category: JSON.parse(p.tags || "[]")[0] || "General",
-
           status: p.published ? "Published" : "Draft",
-
           imageUrl: p.imageUrl,
-
+          attachmentUrl: p.attachmentUrl,
+          attachmentType: p.attachmentType,
+          attachmentName: p.attachmentName,
+          mediaKind: p.attachmentType ? getMediaKind(p.attachmentType) : p.imageUrl ? "image" : null,
         }));
 
         setProjects(posts);
@@ -85,21 +82,17 @@ export default function MyProjects() {
               projects.map((p) => (
 
                 <ProjectCard
-
                   key={p.id}
-
                   id={p.id}
-
                   title={p.title}
-
                   description={p.description}
-
                   category={p.category}
-
                   status={p.status}
-
                   imageUrl={p.imageUrl}
-
+                  attachmentUrl={p.attachmentUrl}
+                  attachmentType={p.attachmentType}
+                  attachmentName={p.attachmentName}
+                  mediaKind={p.mediaKind}
                 />
 
               ))

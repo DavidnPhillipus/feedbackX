@@ -28,17 +28,19 @@ function containsSpecial(value: string): boolean {
     return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value);
 }
 
+const passwordField = z
+    .string()
+    .min(8, 'at least 8 chars')
+    .refine(containsNumber, 'Must contain atleast 1 number')
+    .refine(containsSpecial, 'must contain a special character');
+
 export const Account = User.pick({
     name: true,
     username: true,
     email: true,
 })
     .extend({
-        password: z
-            .string()
-            .min(8, 'at least 8 chars')
-            .refine(containsNumber, 'Must contain atleast 1 number')
-            .refine(containsSpecial, 'must contain a special character'),
+        password: passwordField,
     })
     .strict();
 
@@ -47,8 +49,13 @@ export const Login = User.pick({
     password: true,
 }).strict();
 
-export const GoogleAuth = z.object({
-    credential: z.string().min(1, 'Google credential is required'),
+export const ForgotPassword = z.object({
+    email: z.string().email(),
+}).strict();
+
+export const ResetPassword = z.object({
+    token: z.string().min(1, 'Reset token is required'),
+    password: passwordField,
 }).strict();
 
 export const UserUpdate = User.partial().omit({ roles: true }).strict();
@@ -58,6 +65,9 @@ export const Post = z.object({
     title: z.string().min(10),
     body: z.string().min(10),
     imageUrl: z.string().optional(),
+    attachmentUrl: z.string().optional(),
+    attachmentType: z.string().optional(),
+    attachmentName: z.string().optional(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
     userId: z.number().int().nonnegative().optional(),
@@ -73,6 +83,10 @@ export const PostUpdate = Post.pick({
     title: true,
     tags: true,
     published: true,
+    imageUrl: true,
+    attachmentUrl: true,
+    attachmentType: true,
+    attachmentName: true,
 }).strict();
 
 export const Reply = z.object({

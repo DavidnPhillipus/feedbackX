@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { loadRoomMessages, saveChatMessage } from "./persistence.js";
 
 export interface ChatMessage {
   id: string;
@@ -6,6 +7,9 @@ export interface ChatMessage {
   senderId: string;
   senderName: string;
   text: string;
+  attachmentUrl: string | undefined;
+  attachmentName: string | undefined;
+  attachmentType: string | undefined;
   timestamp: string;
 }
 
@@ -14,6 +18,8 @@ export interface ChatRoom {
   name: string;
   avatar: string;
   description?: string;
+  postId?: number;
+  ownerId?: string;
   members: string[];
   memberNames: Record<string, string>;
   messages: ChatMessage[];
@@ -23,124 +29,40 @@ export interface ChatRoom {
   createdAt: string;
 }
 
-const SEED_ROOMS: Omit<ChatRoom, "unread" | "memberNames">[] = [
-  {
-    id: "r1",
-    name: "Landing Page Redesign",
-    avatar: "https://i.pravatar.cc/40?img=5",
-    description: "Feedback on hero section, spacing, and copy",
-    members: [],
-    messages: [
-      {
-        id: "m-r1-1",
-        roomId: "r1",
-        senderId: "u-alice",
-        senderName: "Alice",
-        text: "The hero spacing looks much better in the latest version!",
-        timestamp: "2026-02-20T09:00:00Z",
-      },
-      {
-        id: "m-r1-2",
-        roomId: "r1",
-        senderId: "u-bob",
-        senderName: "Bob",
-        text: "Agreed — I'd tighten the CTA margin slightly.",
-        timestamp: "2026-02-20T09:05:00Z",
-      },
-    ],
-    lastMessage: "Great improvements! The spacing looks much better",
-    date: "18/02/26",
-    createdAt: "2026-02-15T10:00:00Z",
-  },
-  {
-    id: "r2",
-    name: "Mobile Auth Flow",
-    avatar: "https://i.pravatar.cc/40?img=6",
-    description: "Signup validation and error states",
-    members: [],
-    messages: [
-      {
-        id: "m-r2-1",
-        roomId: "r2",
-        senderId: "u-carol",
-        senderName: "Carol",
-        text: "Need feedback on the signup validation messages.",
-        timestamp: "2026-02-19T14:00:00Z",
-      },
-    ],
-    lastMessage: "Need feedback on the signup validation",
-    date: "17/02/26",
-    createdAt: "2026-02-14T10:00:00Z",
-  },
-  {
-    id: "r3",
-    name: "Dashboard Analytics",
-    avatar: "https://i.pravatar.cc/40?img=7",
-    description: "Chart layouts and data visualization",
-    members: [],
-    messages: [
-      {
-        id: "m-r3-1",
-        roomId: "r3",
-        senderId: "u-dave",
-        senderName: "Dave",
-        text: "The charts look fantastic! Love the color palette.",
-        timestamp: "2026-02-20T11:00:00Z",
-      },
-    ],
-    lastMessage: "The charts look fantastic!",
-    date: "19/02/26",
-    createdAt: "2026-02-13T10:00:00Z",
-  },
-  {
-    id: "r4",
-    name: "Component Library",
-    avatar: "https://i.pravatar.cc/40?img=8",
-    description: "Button variants and design tokens",
-    members: [],
-    messages: [],
-    lastMessage: "Let's discuss the button variants",
-    date: "16/02/26",
-    createdAt: "2026-02-12T10:00:00Z",
-  },
-  {
-    id: "r5",
-    name: "API Documentation Review",
-    avatar: "https://i.pravatar.cc/40?img=9",
-    description: "OpenAPI specs and examples",
-    members: [],
-    messages: [],
-    lastMessage: "Documentation looks comprehensive",
-    date: "15/02/26",
-    createdAt: "2026-02-11T10:00:00Z",
-  },
-];
-
-function initRooms(): Map<string, ChatRoom> {
-  const map = new Map<string, ChatRoom>();
-  for (const seed of SEED_ROOMS) {
-    map.set(seed.id, {
-      ...seed,
-      memberNames: {},
-      unread: {},
-    });
-  }
-  return map;
+export interface ChatRoomSummary {
+  id: string;
+  name: string;
+  avatar: string;
+  description?: string;
+  postId?: number;
+  lastMessage: string;
+  date: string;
+  unread: number;
+  memberCount: number;
+  members: { id: string; name: string }[];
 }
 
-const rooms = initRooms();
+const rooms = new Map<string, ChatRoom>();
+const postIdToRoomId = new Map<number, string>();
 
 /** socketId -> { userId, userName, roomId } */
 export const onlineUsers = new Map<
   string,
-  { userId: string; userName: string; roomId?: string }
+  { userId: string; userName: string; roomId: string | undefined }
 >();
 
-export function getAllRooms(): ChatRoom[] {
-  return Array.from(rooms.values()).map((room) => serializeRoom(room));
+export function getAllRooms(): ChatRoomSummary[] {
+  return Array.from(rooms.values())
+    .map((room) => serializeRoom(room))
+    .sort((a, b) => {
+      const aPost = a.id.startsWith("post-") ? 0 : 1;
+      const bPost = b.id.startsWith("post-") ? 0 : 1;
+      if (aPost !== bPost) return aPost - bPost;
+      return a.name.localeCompare(b.name);
+    });
 }
 
-export function getRoom(roomId: string): ChatRoom | undefined {
+export function getRoom(roomId: string): ChatRoomSummary | undefined {
   const room = rooms.get(roomId);
   return room ? serializeRoom(room) : undefined;
 }
@@ -149,12 +71,34 @@ export function getRoomMessages(roomId: string): ChatMessage[] {
   return rooms.get(roomId)?.messages ?? [];
 }
 
-function serializeRoom(room: ChatRoom) {
+export async function hydrateRoomMessages(roomId: string): Promise<ChatMessage[]> {
+  const room = rooms.get(roomId);
+  if (!room) return [];
+
+  try {
+    const persisted = await loadRoomMessages(roomId);
+    if (persisted.length > 0) {
+      room.messages = persisted;
+      const last = persisted[persisted.length - 1];
+      if (last) {
+        room.lastMessage = last.text || last.attachmentName || "Attachment";
+        room.date = new Date(last.timestamp).toLocaleDateString("en-GB");
+      }
+    }
+  } catch (err) {
+    console.warn(`Could not load messages for room ${roomId}:`, err);
+  }
+
+  return room.messages;
+}
+
+function serializeRoom(room: ChatRoom): ChatRoomSummary {
   return {
     id: room.id,
     name: room.name,
     avatar: room.avatar,
-    description: room.description,
+    ...(room.description ? { description: room.description } : {}),
+    ...(room.postId !== undefined ? { postId: room.postId } : {}),
     lastMessage: room.lastMessage,
     date: room.date,
     unread: Object.values(room.unread).reduce((a, b) => a + b, 0),
@@ -166,13 +110,81 @@ function serializeRoom(room: ChatRoom) {
   };
 }
 
+export function getRoomByPostId(postId: number) {
+  const roomId = postIdToRoomId.get(postId);
+  if (!roomId) return undefined;
+  const room = rooms.get(roomId);
+  return room ? serializeRoom(room) : undefined;
+}
+
+export function createRoomForPost(
+  postId: number,
+  title: string,
+  imageUrl: string | null,
+  ownerUserId: number,
+  ownerName: string
+) {
+  const existing = getRoomByPostId(postId);
+  if (existing) return existing;
+
+  const id = `post-${postId}`;
+  const ownerChatId = `u-${ownerUserId}`;
+  const now = new Date();
+  const welcomeText = `Welcome to the feedback room for "${title}". Share your thoughts!`;
+
+  const room: ChatRoom = {
+    id,
+    postId,
+    ownerId: ownerChatId,
+    name: title,
+    avatar: imageUrl || "",
+    description: `Feedback and discussion for this post`,
+    members: [ownerChatId],
+    memberNames: { [ownerChatId]: ownerName },
+    messages: [
+      {
+        id: nanoid(12),
+        roomId: id,
+        senderId: "system",
+        senderName: "System",
+        text: welcomeText,
+        attachmentUrl: undefined,
+        attachmentName: undefined,
+        attachmentType: undefined,
+        timestamp: now.toISOString(),
+      },
+    ],
+    lastMessage: welcomeText,
+    date: now.toLocaleDateString("en-GB"),
+    unread: {},
+    createdAt: now.toISOString(),
+  };
+
+  rooms.set(id, room);
+  postIdToRoomId.set(postId, id);
+
+  void hydrateRoomMessages(id).catch(() => {});
+
+  return serializeRoom(room);
+}
+
+export function getOrCreateRoomForPost(
+  postId: number,
+  title: string,
+  imageUrl: string | null,
+  ownerUserId: number,
+  ownerName: string
+) {
+  return createRoomForPost(postId, title, imageUrl, ownerUserId, ownerName);
+}
+
 export function createRoom(name: string, userId: string, userName: string) {
   const id = `r-${nanoid(8)}`;
   const now = new Date();
   const room: ChatRoom = {
     id,
     name,
-    avatar: `https://i.pravatar.cc/40?u=${id}`,
+    avatar: "",
     description: "",
     members: [userId],
     memberNames: { [userId]: userName },
@@ -204,32 +216,50 @@ export function leaveRoom(roomId: string, userId: string) {
   return room;
 }
 
-export function addMessage(
+export async function addMessage(
   roomId: string,
   senderId: string,
   senderName: string,
-  text: string
-): ChatMessage | null {
+  text: string,
+  attachment?: {
+    url?: string | undefined;
+    name?: string | undefined;
+    type?: string | undefined;
+  }
+): Promise<ChatMessage | null> {
   const room = rooms.get(roomId);
   if (!room) return null;
+
+  const trimmed = text?.trim() ?? "";
+  const hasAttachment = Boolean(attachment?.url);
+  if (!trimmed && !hasAttachment) return null;
 
   const msg: ChatMessage = {
     id: nanoid(12),
     roomId,
     senderId,
     senderName,
-    text,
+    text: trimmed,
+    attachmentUrl: attachment?.url,
+    attachmentName: attachment?.name,
+    attachmentType: attachment?.type,
     timestamp: new Date().toISOString(),
   };
 
   room.messages.push(msg);
-  room.lastMessage = text;
+  room.lastMessage = trimmed || attachment?.name || "Attachment";
   room.date = new Date().toLocaleDateString("en-GB");
 
   for (const memberId of room.members) {
     if (memberId !== senderId) {
       room.unread[memberId] = (room.unread[memberId] ?? 0) + 1;
     }
+  }
+
+  try {
+    await saveChatMessage(msg);
+  } catch (err) {
+    console.error("Failed to persist chat message:", err);
   }
 
   return msg;

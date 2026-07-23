@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import GoogleSignIn from "../components/GoogleSignIn";
+import * as api from "../services/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState(location.state?.message || "");
   const [loading, setLoading] = useState(false);
 
   const from = location.state?.from?.pathname || "/home";
@@ -17,6 +18,7 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setNotice("");
     setLoading(true);
     try {
       await login(username.trim(), password);
@@ -36,6 +38,7 @@ export default function Login() {
         </h1>
         <form className="fx-auth__form" onSubmit={handleSubmit}>
           {error && <p className="fx-auth__error">{error}</p>}
+          {notice && <p className="fx-auth__success">{notice}</p>}
           <input
             type="text"
             placeholder="Email or username"
@@ -55,18 +58,15 @@ export default function Login() {
           <button type="submit" className="fx-auth__btn" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
-          <div className="fx-auth__divider">OR</div>
-          <GoogleSignIn />
           <p className="fx-auth__footer">
-            <span className="fx-auth__link">Forgot password?</span>
+            <button type="button" className="fx-auth__link" onClick={() => navigate("/ForgotPassword")}>
+              Forgot password?
+            </button>
           </p>
         </form>
         <p className="fx-auth__footer">
           Don't have an account?{' '}
           <button type="button" className="fx-auth__link" onClick={() => navigate('/Register')}>Register</button>
-        </p>
-        <p className="fx-auth__footer fx-muted" style={{ fontSize: "0.8rem" }}>
-          Demo: demo_user / Demo1234! &nbsp;|&nbsp; Admin: admin / admin369!
         </p>
       </div>
       <footer className="fx-auth__site-footer">

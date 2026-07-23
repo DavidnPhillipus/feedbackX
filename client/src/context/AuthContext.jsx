@@ -39,15 +39,7 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (payload) => {
-    const data = await api.register(payload);
-    setUser(data.user);
-    return data;
-  };
-
-  const loginWithGoogle = async (credential) => {
-    const data = await api.loginWithGoogle(credential);
-    setUser(data.user);
-    return data;
+    return api.register(payload);
   };
 
   const logout = () => {
@@ -65,7 +57,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, loginWithGoogle, logout, refreshUser, updateUser, isAdmin }}
+      value={{ user, loading, login, register, logout, refreshUser, updateUser, isAdmin }}
     >
       {children}
     </AuthContext.Provider>

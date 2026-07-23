@@ -10,8 +10,9 @@
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
-    "types": [],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "types": ["node"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],

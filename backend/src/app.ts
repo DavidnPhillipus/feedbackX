@@ -15,7 +15,8 @@ import authenticated from "./middleware/auth.js";
 
 const app = express();
 
-app.use(cors({ origin: "*" }));
+const corsOrigin = process.env.CLIENT_URL?.trim() || "*";
+app.use(cors({ origin: corsOrigin }));
 app.use(express.json({ limit: "15mb" }));
 app.use(xss);
 app.use(logging.logRequest);

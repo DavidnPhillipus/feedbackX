@@ -1,27 +1,31 @@
 import { supabase, STORAGE_BUCKET } from "../lib/supabase.js";
-
-const ALLOWED_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-]);
+import {
+  ALL_ALLOWED_MIMES,
+  extensionForMime,
+  getMaxSizeForMime,
+  getMediaKind,
+} from "./fileTypes.js";
 
 export async function uploadToSupabase(
   buffer: Buffer,
   mimeType: string,
   originalName?: string
 ): Promise<string> {
-  if (!ALLOWED_TYPES.has(mimeType)) {
-    throw new Error("Only JPEG, PNG, GIF, and WebP images are allowed");
+  if (!ALL_ALLOWED_MIMES.includes(mimeType)) {
+    throw new Error(
+      "Unsupported file type. Allowed: images (JPG, PNG, GIF, WebP), videos (MP4, WebM, MOV), PDF, and documents (DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT)"
+    );
   }
 
-  if (buffer.length > 10 * 1024 * 1024) {
-    throw new Error("Image too large (max 10MB)");
+  const maxSize = getMaxSizeForMime(mimeType);
+  if (buffer.length > maxSize) {
+    const mb = Math.round(maxSize / (1024 * 1024));
+    throw new Error(`File too large (max ${mb}MB for this type)`);
   }
 
-  const ext = mimeType.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
-  const base = originalName?.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "") || "image";
+  const ext = originalName?.split(".").pop()?.toLowerCase() || extensionForMime(mimeType);
+  const base =
+    originalName?.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "") || getMediaKind(mimeType) || "file";
   const filename = `${Date.now()}-${base}.${ext}`;
 
   const { data, error } = await supabase.storage

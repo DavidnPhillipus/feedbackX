@@ -1,17 +1,32 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getRooms, getInvites } from "../services/mockApi";
+import { useAuth } from "../context/AuthContext";
+import * as api from "../services/api";
+import { fetchRooms } from "../services/socket";
 
 export default function Activity() {
+  const { user } = useAuth();
   const [invites, setInvites] = useState([]);
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
     let mounted = true;
-    getInvites().then((data) => mounted && setInvites(data)).catch(() => {});
-    getRooms().then((data) => mounted && setRooms(data)).catch(() => {});
-    return () => { mounted = false; };
-  }, []);
+
+    fetchRooms()
+      .then((data) => mounted && setRooms(data))
+      .catch(() => mounted && setRooms([]));
+
+    if (user?.id) {
+      api
+        .fetchInvites(user.id)
+        .then((data) => mounted && setInvites(data.invites || []))
+        .catch(() => mounted && setInvites([]));
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [user?.id]);
 
   const latestInvite = invites[0];
   const latestRoom = rooms[0];
@@ -22,22 +37,24 @@ export default function Activity() {
       <div className="fx-panel__sections">
         <div className="fx-panel__section">
           <h4>Invites</h4>
-          {latestInvite && (
+          {latestInvite ? (
             <div className="fx-panel__item">
               <div className="fx-panel__avatar">
                 {latestInvite.title ? latestInvite.title.charAt(0) : "?"}
               </div>
               <div>
                 <p className="fx-panel__item-title">{latestInvite.title}</p>
-                <p className="fx-panel__item-meta">New: {invites.length}</p>
+                <p className="fx-panel__item-meta">Total: {invites.length}</p>
               </div>
             </div>
+          ) : (
+            <p className="fx-muted">No invites yet</p>
           )}
-          <Link to="/feedbackRooms" className="fx-panel__link">View All</Link>
+          <Link to="/Invites" className="fx-panel__link">View All</Link>
         </div>
         <div className="fx-panel__section">
           <h4>Feedback</h4>
-          {latestRoom && (
+          {latestRoom ? (
             <div className="fx-panel__item">
               <div className="fx-panel__avatar">
                 {latestRoom.name ? latestRoom.name.charAt(0) : "?"}
@@ -47,6 +64,8 @@ export default function Activity() {
                 <p className="fx-panel__item-meta">Total: {rooms.length}</p>
               </div>
             </div>
+          ) : (
+            <p className="fx-muted">No feedback rooms yet</p>
           )}
           <Link to="/feedbackRooms" className="fx-panel__link">View All</Link>
         </div>

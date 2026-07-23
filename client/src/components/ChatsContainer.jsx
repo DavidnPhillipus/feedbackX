@@ -3,7 +3,7 @@ import { FiPlus, FiSearch, FiWifi, FiWifiOff } from "react-icons/fi";
 import { useChat } from "../context/ChatContext";
 import ChatRoomTemplate from "../Templates/ChatRoomTemplate";
 
-export default function ChatsContainer({ selectedRoom, onSelect }) {
+export default function ChatsContainer({ selectedRoom, onSelect, hiddenOnMobile }) {
   const { rooms, connected, createRoom } = useChat();
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
@@ -22,7 +22,9 @@ export default function ChatsContainer({ selectedRoom, onSelect }) {
   };
 
   return (
-    <aside className="fx-chatwin__sidebar">
+    <aside
+      className={`fx-chatwin__sidebar${hiddenOnMobile ? " fx-chatwin__sidebar--hidden" : ""}`}
+    >
       <div className="fx-chatwin__sidebar-head">
         <div>
           <h2>Messages</h2>

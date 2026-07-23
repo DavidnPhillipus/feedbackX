@@ -1,11 +1,22 @@
+import { Link } from "react-router-dom";
+import UserAvatar from "../components/UserAvatar";
+
 export default function SearchTemplate({ item }) {
-  const avatar = item?.profilePicture || item?.avatar || "https://via.placeholder.com/40";
   const title = item?.title || "Untitled";
+  const author = item?.username || item?.authorUsername || "Unknown";
 
   return (
-    <div className="fx-search-page__result">
-      <img src={avatar} alt="" />
-      <p>{title}</p>
-    </div>
+    <Link to={`/feedbackRooms?post=${item.id}`} className="fx-search-page__result">
+      <UserAvatar
+        src={item?.profilePicture}
+        name={author}
+        username={item?.authorUsername}
+        size={40}
+      />
+      <div>
+        <p>{title}</p>
+        <span className="fx-muted">{author}</span>
+      </div>
+    </Link>
   );
 }
