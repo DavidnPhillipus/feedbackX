@@ -17,7 +17,10 @@ import SmallSideBar from "./SmallSideBar";
 import MoreMenu from "./MoreMenu";
 import { useAuth } from "../context/AuthContext";
 
-function NavItem({ to, icon: Icon, label, onClick }) {
+function NavItem(props) {
+  const { to, icon: Icon, label, onClick } = props;
+  const iconMarkup = Icon ? <Icon size={20} aria-hidden="true" /> : null;
+
   if (onClick) {
     return (
       <button
@@ -27,7 +30,7 @@ function NavItem({ to, icon: Icon, label, onClick }) {
         aria-label={label}
         onClick={onClick}
       >
-        <Icon size={20} aria-hidden="true" />
+        {iconMarkup}
         <span className="fx-nav__label">{label}</span>
       </button>
     );
@@ -40,7 +43,7 @@ function NavItem({ to, icon: Icon, label, onClick }) {
       title={label}
       aria-label={label}
     >
-      <Icon size={20} aria-hidden="true" />
+      {iconMarkup}
       <span className="fx-nav__label">{label}</span>
     </NavLink>
   );

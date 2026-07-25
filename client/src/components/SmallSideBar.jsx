@@ -12,11 +12,14 @@ import {
 } from "react-icons/fi";
 import MoreMenu from "./MoreMenu";
 
-function NavItem({ to, icon: Icon, label, onClick }) {
+function NavItem(props) {
+  const { to, icon: Icon, label, onClick } = props;
+  const iconMarkup = Icon ? <Icon size={20} /> : null;
+
   if (onClick) {
     return (
       <button className="fx-nav__item" type="button" title={label} aria-label={label} onClick={onClick}>
-        <Icon size={20} />
+        {iconMarkup}
       </button>
     );
   }
@@ -28,7 +31,7 @@ function NavItem({ to, icon: Icon, label, onClick }) {
       title={label}
       aria-label={label}
     >
-      <Icon size={20} />
+      {iconMarkup}
     </NavLink>
   );
 }

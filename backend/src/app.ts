@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import cors from "cors";
 import usersRouter from "./routes/users.js";
 import postsRouter from "./routes/posts.js";
@@ -20,6 +21,7 @@ app.use(cors({ origin: corsOrigin }));
 app.use(express.json({ limit: "15mb" }));
 app.use(xss);
 app.use(logging.logRequest);
+app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
 app.get("/", (_req, res) => {
   res.json({ message: "feedbackX API" });
