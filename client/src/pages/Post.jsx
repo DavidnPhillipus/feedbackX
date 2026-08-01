@@ -94,10 +94,8 @@ export default function PostPage() {
         title,
         body: description,
         tags: [category],
-        imageUrl,
-        attachmentUrl,
-        attachmentType,
-        attachmentName,
+        ...(imageUrl ? { imageUrl } : {}),
+        ...(attachmentUrl ? { attachmentUrl, attachmentType, attachmentName } : {}),
         published,
       });
 
