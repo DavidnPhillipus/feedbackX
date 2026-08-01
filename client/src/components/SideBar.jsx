@@ -14,8 +14,32 @@ import {
 import { useState, useEffect } from "react";
 import SearchModal from "./SearchModal";
 import SmallSideBar from "./SmallSideBar";
+import MobileBottomNav from "./MobileBottomNav";
 import MoreMenu from "./MoreMenu";
 import { useAuth } from "../context/AuthContext";
+import { useChat } from "../context/ChatContext";
+
+const PHONE_MAX = 640;
+const TABLET_MAX = 767;
+
+function useViewportMode() {
+  const getMode = () => {
+    const w = typeof window !== "undefined" ? window.innerWidth : 1024;
+    if (w <= PHONE_MAX) return "phone";
+    if (w <= TABLET_MAX) return "tablet";
+    return "desktop";
+  };
+
+  const [mode, setMode] = useState(getMode);
+
+  useEffect(() => {
+    const update = () => setMode(getMode());
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return mode;
+}
 
 function NavItem(props) {
   const { to, icon: Icon, label, onClick } = props;
@@ -50,18 +74,14 @@ function NavItem(props) {
 }
 
 export default function SideBar() {
-  const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
+  const mode = useViewportMode();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, isAdmin } = useAuth();
+  const { activeRoom } = useChat();
   const isChatPage = location.pathname === "/feedbackRooms";
-
-  useEffect(() => {
-    const handleResize = () => setIsCompact(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const phoneChatActive = mode === "phone" && isChatPage && !!activeRoom;
 
   const handleLogout = () => {
     logout();
@@ -79,14 +99,25 @@ export default function SideBar() {
     { label: "Log out", icon: FiLogOut, onClick: handleLogout, danger: true },
   ];
 
+  const appClass = [
+    "fx-app",
+    isChatPage ? "fx-app--chat" : "",
+    mode === "phone" ? "fx-app--phone" : "",
+    phoneChatActive ? "fx-app--phone-chat" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={`fx-app${isChatPage ? " fx-app--chat" : ""}`}>
-      {isCompact ? (
+    <div className={appClass}>
+      {mode === "tablet" && (
         <SmallSideBar
           onSearchOpen={() => setIsSearchOpen(true)}
           moreItems={moreItems}
         />
-      ) : (
+      )}
+
+      {mode === "desktop" && (
         <aside className="fx-sidebar">
           <h1 className="fx-logo">
             feedback<span className="fx-logo__accent">X</span>
@@ -111,6 +142,10 @@ export default function SideBar() {
           <Outlet />
         </div>
       </main>
+
+      {mode === "phone" && (
+        <MobileBottomNav onSearchOpen={() => setIsSearchOpen(true)} />
+      )}
 
       {isSearchOpen && <SearchModal onClose={() => setIsSearchOpen(false)} />}
     </div>
