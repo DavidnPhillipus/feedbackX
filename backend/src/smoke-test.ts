@@ -71,10 +71,17 @@ async function api(route: string, options: ApiOptions = {}) {
 }
 
 async function testHealth() {
-  const res = await fetch(API.replace("/v1", "/"));
-  const data = await res.json();
-  if (!data.message) throw new Error("No API message");
-  ok("API health");
+  const base = API.replace(/\/v1\/?$/, "");
+  const root = await fetch(`${base}/`).then((r) => r.json());
+  if (!root.message) throw new Error("No API message");
+  ok("API root");
+
+  const health = await fetch(`${base}/health`);
+  const healthData = await health.json();
+  if (!health.ok || healthData.status !== "ok") {
+    throw new Error(`Health check failed: ${JSON.stringify(healthData)}`);
+  }
+  ok("API health + DB");
 }
 
 async function testAuth() {
