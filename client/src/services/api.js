@@ -46,7 +46,15 @@ async function request(path, options = {}) {
     options.body = JSON.stringify(options.body);
   }
 
-  const res = await fetch(apiUrl(path), { ...options, headers });
+  let res;
+  try {
+    res = await fetch(apiUrl(path), { ...options, headers });
+  } catch {
+    throw new Error(
+      "Cannot reach the API. Make sure the backend is running and try again."
+    );
+  }
+
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
