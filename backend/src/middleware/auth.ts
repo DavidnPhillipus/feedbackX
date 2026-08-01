@@ -1,9 +1,6 @@
 import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import env from "dotenv";
 import { hasRole } from "../utils/roles.js";
-
-env.config();
 
 const auth: RequestHandler = (req, res, next) => {
   try {
