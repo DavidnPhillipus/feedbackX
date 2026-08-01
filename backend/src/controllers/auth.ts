@@ -1,13 +1,10 @@
 import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import prisma from "../prisma.js";
-import env from "dotenv";
 import * as bcrypt from "bcrypt";
 import { parseRoles, stringifyRoles } from "../utils/roles.js";
 import { buildResetUrl, createPasswordResetToken } from "../utils/passwordReset.js";
 import { isEmailConfigured, sendPasswordResetEmail } from "../utils/mail.js";
-
-env.config();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -126,6 +123,15 @@ export const forgotPassword: RequestHandler = async (req, res) => {
   const token = await createPasswordResetToken(user.id);
   const resetUrl = buildResetUrl(token);
 
+  if (!isEmailConfigured()) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("Password reset requested but email is not configured");
+      return res.status(503).json({ message: "Password reset is temporarily unavailable." });
+    }
+    // Dev-only fallback — never expose reset links in production.
+    return res.json({ message: RESET_SUCCESS_MESSAGE, resetUrl });
+  }
+
   try {
     await sendPasswordResetEmail(user.email, resetUrl);
   } catch (err) {
@@ -133,12 +139,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     return res.status(500).json({ message: "Could not send reset email. Try again later." });
   }
 
-  const payload: { message: string; resetUrl?: string } = { message: RESET_SUCCESS_MESSAGE };
-  if (!isEmailConfigured()) {
-    payload.resetUrl = resetUrl;
-  }
-
-  res.json(payload);
+  res.json({ message: RESET_SUCCESS_MESSAGE });
 };
 
 export const resetPassword: RequestHandler = async (req, res) => {
