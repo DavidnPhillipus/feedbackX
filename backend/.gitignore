@@ -6,3 +6,9 @@ node_modules
 prisma/dev.db
 prisma/*.db
 prisma/*.db-journal
+
+# Local upload fallback (use Supabase Storage in production)
+uploads/*
+!uploads/.gitkeep
+test-upload.pdf
+tmp-upload.pdf
