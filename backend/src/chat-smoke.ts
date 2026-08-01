@@ -154,12 +154,25 @@ async function main() {
     if (!received?.id) throw new Error("Missing message id");
     ok("B receives A's realtime message");
 
+    const reply = `pong-${runId}`;
+    const waitA = waitForMessage(sockA, (m) => m?.text === reply && m?.roomId === roomId);
+    sockB.emit("chatMessage", {
+      roomId,
+      text: reply,
+      userId: idB,
+      userName: userB.name,
+    });
+    const replyMsg = await waitA;
+    if (!replyMsg?.id) throw new Error("Missing reply id");
+    ok("A receives B's realtime reply");
+
     const history = await fetch(`${API}/rooms/${encodeURIComponent(roomId)}/messages`).then((r) =>
       r.json()
     );
     const persisted = (history.messages ?? []).some((m: { text?: string }) => m.text === marker);
-    if (!persisted) throw new Error("Message not persisted");
-    ok("Message persisted in DB");
+    const replyPersisted = (history.messages ?? []).some((m: { text?: string }) => m.text === reply);
+    if (!persisted || !replyPersisted) throw new Error("Message not persisted");
+    ok("Messages persisted in DB");
 
     sockA.disconnect();
     sockB.disconnect();

@@ -37,6 +37,7 @@ export interface ChatRoomSummary {
   postId?: number;
   lastMessage: string;
   date: string;
+  lastActivityAt: string;
   unread: number;
   memberCount: number;
   members: { id: string; name: string }[];
@@ -51,20 +52,20 @@ export const onlineUsers = new Map<
   { userId: string; userName: string; roomId: string | undefined }
 >();
 
-export function getAllRooms(): ChatRoomSummary[] {
+export function getAllRooms(forUserId?: string): ChatRoomSummary[] {
   return Array.from(rooms.values())
-    .map((room) => serializeRoom(room))
+    .map((room) => serializeRoom(room, forUserId))
     .sort((a, b) => {
-      const aPost = a.id.startsWith("post-") ? 0 : 1;
-      const bPost = b.id.startsWith("post-") ? 0 : 1;
-      if (aPost !== bPost) return aPost - bPost;
+      const aTime = Date.parse(a.lastActivityAt) || 0;
+      const bTime = Date.parse(b.lastActivityAt) || 0;
+      if (aTime !== bTime) return bTime - aTime;
       return a.name.localeCompare(b.name);
     });
 }
 
-export function getRoom(roomId: string): ChatRoomSummary | undefined {
+export function getRoom(roomId: string, forUserId?: string): ChatRoomSummary | undefined {
   const room = rooms.get(roomId);
-  return room ? serializeRoom(room) : undefined;
+  return room ? serializeRoom(room, forUserId) : undefined;
 }
 
 export function getRoomMessages(roomId: string): ChatMessage[] {
@@ -82,7 +83,7 @@ export async function hydrateRoomMessages(roomId: string): Promise<ChatMessage[]
       const last = persisted[persisted.length - 1];
       if (last) {
         room.lastMessage = last.text || last.attachmentName || "Attachment";
-        room.date = new Date(last.timestamp).toLocaleDateString("en-GB");
+        room.date = last.timestamp;
       }
     }
   } catch (err) {
@@ -92,7 +93,11 @@ export async function hydrateRoomMessages(roomId: string): Promise<ChatMessage[]
   return room.messages;
 }
 
-function serializeRoom(room: ChatRoom): ChatRoomSummary {
+function serializeRoom(room: ChatRoom, forUserId?: string): ChatRoomSummary {
+  const lastActivityAt =
+    room.messages[room.messages.length - 1]?.timestamp ||
+    (Date.parse(room.date) ? room.date : room.createdAt);
+
   return {
     id: room.id,
     name: room.name,
@@ -100,8 +105,9 @@ function serializeRoom(room: ChatRoom): ChatRoomSummary {
     ...(room.description ? { description: room.description } : {}),
     ...(room.postId !== undefined ? { postId: room.postId } : {}),
     lastMessage: room.lastMessage,
-    date: room.date,
-    unread: Object.values(room.unread).reduce((a, b) => a + b, 0),
+    date: lastActivityAt,
+    lastActivityAt,
+    unread: forUserId ? room.unread[forUserId] ?? 0 : 0,
     memberCount: room.members.length,
     members: room.members.map((id) => ({
       id,
@@ -110,11 +116,11 @@ function serializeRoom(room: ChatRoom): ChatRoomSummary {
   };
 }
 
-export function getRoomByPostId(postId: number) {
+export function getRoomByPostId(postId: number, forUserId?: string) {
   const roomId = postIdToRoomId.get(postId);
   if (!roomId) return undefined;
   const room = rooms.get(roomId);
-  return room ? serializeRoom(room) : undefined;
+  return room ? serializeRoom(room, forUserId) : undefined;
 }
 
 export function createRoomForPost(
@@ -155,15 +161,13 @@ export function createRoomForPost(
       },
     ],
     lastMessage: welcomeText,
-    date: now.toLocaleDateString("en-GB"),
+    date: now.toISOString(),
     unread: {},
     createdAt: now.toISOString(),
   };
 
   rooms.set(id, room);
   postIdToRoomId.set(postId, id);
-
-  void hydrateRoomMessages(id).catch(() => {});
 
   return serializeRoom(room);
 }
@@ -190,12 +194,12 @@ export function createRoom(name: string, userId: string, userName: string) {
     memberNames: { [userId]: userName },
     messages: [],
     lastMessage: "Room created",
-    date: now.toLocaleDateString("en-GB"),
+    date: now.toISOString(),
     unread: {},
     createdAt: now.toISOString(),
   };
   rooms.set(id, room);
-  return serializeRoom(room);
+  return serializeRoom(room, userId);
 }
 
 export function joinRoom(roomId: string, userId: string, userName: string) {
@@ -248,7 +252,7 @@ export async function addMessage(
 
   room.messages.push(msg);
   room.lastMessage = trimmed || attachment?.name || "Attachment";
-  room.date = new Date().toLocaleDateString("en-GB");
+  room.date = msg.timestamp;
 
   for (const memberId of room.members) {
     if (memberId !== senderId) {

@@ -12,22 +12,29 @@ import {
   onlineUsers,
 } from "../chat/store";
 
+function emitRoomsList(io: Server) {
+  for (const [socketId, info] of onlineUsers.entries()) {
+    io.to(socketId).emit("roomsList", getAllRooms(info.userId));
+  }
+}
+
 export default function chatSocket(io: Server, socket: Socket) {
   socket.on("register", ({ userId, userName }: { userId: string; userName: string }) => {
     onlineUsers.set(socket.id, { userId, userName, roomId: undefined });
     socket.emit("registered", { userId, userName });
-    socket.emit("roomsList", getAllRooms());
+    socket.emit("roomsList", getAllRooms(userId));
   });
 
   socket.on("getRooms", () => {
-    socket.emit("roomsList", getAllRooms());
+    const user = onlineUsers.get(socket.id);
+    socket.emit("roomsList", getAllRooms(user?.userId));
   });
 
   socket.on(
     "createRoom",
     ({ roomName, userId, userName }: { roomName: string; userId: string; userName: string }) => {
       const room = createRoom(roomName, userId, userName);
-      io.emit("roomsList", getAllRooms());
+      emitRoomsList(io);
       socket.emit("roomCreated", room);
     }
   );
@@ -74,7 +81,7 @@ export default function chatSocket(io: Server, socket: Socket) {
         online: getOnlineInRoom(roomId),
       });
 
-      io.emit("roomsList", getAllRooms());
+      emitRoomsList(io);
     }
   );
 
@@ -91,7 +98,7 @@ export default function chatSocket(io: Server, socket: Socket) {
       online: getOnlineInRoom(roomId),
     });
 
-    io.emit("roomsList", getAllRooms());
+    emitRoomsList(io);
   });
 
   socket.on(
@@ -125,7 +132,7 @@ export default function chatSocket(io: Server, socket: Socket) {
       if (!msg) return;
 
       io.to(`room-${roomId}`).emit("chatMessage", msg);
-      io.emit("roomsList", getAllRooms());
+      emitRoomsList(io);
       callback?.(msg);
     }
   );
