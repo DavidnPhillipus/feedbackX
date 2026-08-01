@@ -9,6 +9,8 @@ import {
   FiX,
   FiMessageSquare,
   FiPaperclip,
+  FiArrowLeft,
+  FiCheck,
 } from "react-icons/fi";
 import { useChat } from "../context/ChatContext";
 import { isSameChatUser } from "../services/socket";
@@ -17,28 +19,45 @@ import EmojiPicker from "./EmojiPicker";
 import UserAvatar from "./UserAvatar";
 import { isEmojiOnly } from "../utils/emoji";
 import { validateProjectFile } from "../utils/fileTypes";
-
-function formatTime(ts) {
-  try {
-    return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  } catch {
-    return "";
-  }
-}
+import { formatChatClock, formatChatDayLabel } from "../utils/chatTime";
 
 function groupMessages(messages) {
   const groups = [];
   let current = null;
 
-  for (const msg of messages) {
-    const day = new Date(msg.timestamp).toLocaleDateString();
+  for (let i = 0; i < messages.length; i += 1) {
+    const msg = messages[i];
+    const day = formatChatDayLabel(msg.timestamp);
     if (!current || current.day !== day) {
       current = { day, items: [] };
       groups.push(current);
     }
-    current.items.push(msg);
+
+    const prev = messages[i - 1];
+    const next = messages[i + 1];
+    const sameSenderAsPrev =
+      prev &&
+      prev.senderId === msg.senderId &&
+      formatChatDayLabel(prev.timestamp) === day;
+    const sameSenderAsNext =
+      next &&
+      next.senderId === msg.senderId &&
+      formatChatDayLabel(next.timestamp) === day;
+
+    current.items.push({
+      ...msg,
+      showAvatar: msg.senderId !== "system" && !sameSenderAsNext,
+      showName: msg.senderId !== "system" && !sameSenderAsPrev,
+      clustered: sameSenderAsPrev,
+    });
   }
   return groups;
+}
+
+function autoResize(el) {
+  if (!el) return;
+  el.style.height = "0px";
+  el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
 }
 
 export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings }) {
@@ -64,18 +83,26 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
   const fileInputRef = useRef(null);
 
   useEffect(() => {
+    setDisplayName(user.name);
+  }, [user.name]);
+
+  useEffect(() => {
     messagesEnd.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingUsers]);
 
   useEffect(() => {
-    if (room) inputRef.current?.focus();
+    if (room) {
+      inputRef.current?.focus();
+      autoResize(inputRef.current);
+    }
   }, [room]);
 
   const handleSend = (e) => {
     e?.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() || uploading) return;
     sendMessage(text);
     setText("");
+    requestAnimationFrame(() => autoResize(inputRef.current));
   };
 
   const insertEmoji = (emoji) => {
@@ -95,6 +122,7 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
       input.focus();
       const pos = start + emoji.length;
       input.setSelectionRange(pos, pos);
+      autoResize(input);
     });
   };
 
@@ -119,6 +147,7 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
         type: file.type,
       });
       setText("");
+      requestAnimationFrame(() => autoResize(inputRef.current));
     } catch (err) {
       setUploadError(err.message || "Could not upload attachment");
     } finally {
@@ -139,12 +168,22 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
           </p>
         )}
         {msg.attachmentUrl && isImage && (
-          <a href={msg.attachmentUrl} target="_blank" rel="noreferrer" className="fx-chatwin__attachment-image">
+          <a
+            href={msg.attachmentUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="fx-chatwin__attachment-image"
+          >
             <img src={msg.attachmentUrl} alt={msg.attachmentName || "Attachment"} />
           </a>
         )}
         {msg.attachmentUrl && !isImage && (
-          <a href={msg.attachmentUrl} target="_blank" rel="noreferrer" className="fx-chatwin__attachment-file">
+          <a
+            href={msg.attachmentUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="fx-chatwin__attachment-file"
+          >
             {msg.attachmentName || "Download attachment"}
           </a>
         )}
@@ -153,19 +192,29 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
   };
 
   const othersTyping = typingUsers.filter((u) => !isSameChatUser(u.userId, user.id));
+  const onlineCount = onlineUsers.length;
+  const typingNames = othersTyping.map((u) => u.userName || "Someone").join(", ");
+  const statusLine =
+    onlineCount > 0
+      ? `${onlineCount} online · ${members.length} members`
+      : `${members.length} members`;
 
   if (!room) {
     return (
       <div className="fx-chatwin__welcome">
         <div className="fx-chatwin__welcome-inner">
-          <FiMessageSquare size={48} strokeWidth={1.5} />
-          <h2>Your feedback rooms</h2>
-          <p>Select a room from the sidebar to start a real-time conversation with your team.</p>
+          <div className="fx-chatwin__welcome-icon">
+            <FiMessageSquare size={36} strokeWidth={1.5} />
+          </div>
+          <h2>Pick a conversation</h2>
+          <p>
+            Select a feedback room on the left to chat in real time — just like your other messaging
+            apps.
+          </p>
           <ul>
-            <li>Live messaging with typing indicators</li>
-            <li>See who's online in each room</li>
-            <li>Share images and emojis in feedback</li>
-            <li>Open a post's feedback room from Give Feedback</li>
+            <li>Live delivery with typing indicators</li>
+            <li>See who’s online in each room</li>
+            <li>Share images and reactions</li>
           </ul>
         </div>
       </div>
@@ -179,22 +228,25 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
       <header className="fx-chatwin__header">
         <div className="fx-chatwin__header-info">
           {onClose && (
-            <button type="button" className="fx-chatwin__back" onClick={onClose} aria-label="Back">
-              ←
+            <button
+              type="button"
+              className="fx-chatwin__back"
+              onClick={onClose}
+              aria-label="Back to chats"
+            >
+              <FiArrowLeft size={20} />
             </button>
           )}
           <UserAvatar
             src={room.avatar}
             name={room.name}
-            size={40}
+            size={42}
             className="fx-chatwin__header-avatar"
           />
-          <div>
+          <div className="fx-chatwin__header-text">
             <h2>{room.name}</h2>
-            <p>
-              {onlineUsers.length > 0
-                ? `${onlineUsers.length} online · ${members.length} members`
-                : `${members.length} members`}
+            <p className={othersTyping.length ? "fx-chatwin__header-typing" : undefined}>
+              {othersTyping.length ? `${typingNames} typing…` : statusLine}
             </p>
           </div>
         </div>
@@ -203,7 +255,8 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
             type="button"
             className={`fx-chatwin__icon-btn${settingsOpen ? " active" : ""}`}
             onClick={onToggleSettings}
-            title="Room settings"
+            title="Room info"
+            aria-label="Room info"
           >
             <FiSettings size={18} />
           </button>
@@ -211,9 +264,12 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
       </header>
 
       <div className="fx-chatwin__body">
-        <div className="fx-chatwin__messages">
+        <div className="fx-chatwin__messages" aria-live="polite">
+          {groups.length === 0 && (
+            <div className="fx-chatwin__messages-empty" aria-hidden="true" />
+          )}
           {groups.map((group) => (
-            <div key={group.day}>
+            <div key={group.day} className="fx-chatwin__day-group">
               <div className="fx-chatwin__date-divider">
                 <span>{group.day}</span>
               </div>
@@ -223,36 +279,44 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
                 return (
                   <div
                     key={msg.id}
-                    className={`fx-chatwin__bubble-row${
-                      isSystem
-                        ? " fx-chatwin__bubble-row--system"
-                        : isOwn
-                          ? " fx-chatwin__bubble-row--own"
-                          : ""
-                    }`}
+                    className={[
+                      "fx-chatwin__bubble-row",
+                      isSystem ? "fx-chatwin__bubble-row--system" : "",
+                      isOwn ? "fx-chatwin__bubble-row--own" : "",
+                      msg.clustered ? "fx-chatwin__bubble-row--clustered" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                   >
                     {!isOwn && !isSystem && (
-                      <div className="fx-chatwin__bubble-avatar">
-                        {msg.senderName.charAt(0).toUpperCase()}
+                      <div
+                        className={`fx-chatwin__bubble-avatar${
+                          msg.showAvatar ? "" : " fx-chatwin__bubble-avatar--spacer"
+                        }`}
+                      >
+                        {msg.showAvatar ? msg.senderName.charAt(0).toUpperCase() : null}
                       </div>
                     )}
                     <div
-                      className={`fx-chatwin__bubble${
-                        isSystem
-                          ? " fx-chatwin__bubble--system"
-                          : isOwn
-                            ? " fx-chatwin__bubble--own"
-                            : ""
-                      }`}
+                      className={[
+                        "fx-chatwin__bubble",
+                        isSystem ? "fx-chatwin__bubble--system" : "",
+                        isOwn ? "fx-chatwin__bubble--own" : "",
+                        msg.clustered ? "fx-chatwin__bubble--clustered" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                     >
-                      {!isOwn && !isSystem && (
-                        <span className="fx-chatwin__bubble-name">{msg.senderName}</span>
-                      )}
-                      {isSystem && (
+                      {!isOwn && !isSystem && msg.showName && (
                         <span className="fx-chatwin__bubble-name">{msg.senderName}</span>
                       )}
                       {renderMessageBody(msg)}
-                      {!isSystem && <time>{formatTime(msg.timestamp)}</time>}
+                      {!isSystem && (
+                        <time>
+                          {formatChatClock(msg.timestamp)}
+                          {isOwn && <FiCheck size={12} aria-hidden="true" />}
+                        </time>
+                      )}
                     </div>
                   </div>
                 );
@@ -263,10 +327,13 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
           {othersTyping.length > 0 && (
             <div className="fx-chatwin__typing">
               <span className="fx-chatwin__typing-dots">
-                <span /><span /><span />
+                <span />
+                <span />
+                <span />
               </span>
-              {othersTyping.map((u) => u.userName).join(", ")}{" "}
-              {othersTyping.length === 1 ? "is" : "are"} typing…
+              <span>
+                {typingNames} {othersTyping.length === 1 ? "is" : "are"} typing…
+              </span>
             </div>
           )}
           <div ref={messagesEnd} />
@@ -275,8 +342,13 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
         {settingsOpen && (
           <aside className="fx-chatwin__settings">
             <div className="fx-chatwin__settings-head">
-              <h3>Room settings</h3>
-              <button type="button" className="fx-chatwin__icon-btn" onClick={onToggleSettings}>
+              <h3>Chat info</h3>
+              <button
+                type="button"
+                className="fx-chatwin__icon-btn"
+                onClick={onToggleSettings}
+                aria-label="Close info"
+              >
                 <FiX size={18} />
               </button>
             </div>
@@ -301,17 +373,20 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
             </div>
 
             <div className="fx-chatwin__settings-section">
-              <h4><FiUsers size={14} /> Members ({members.length})</h4>
+              <h4>
+                <FiUsers size={14} /> Members ({members.length})
+              </h4>
               <ul className="fx-chatwin__member-list">
-                {members.map((m) => (
-                  <li key={m.id}>
-                    <span className="fx-chatwin__member-avatar">{m.name.charAt(0)}</span>
-                    {m.name}
-                    {onlineUsers.some((o) => o.userId === m.id) && (
-                      <span className="fx-chatwin__online-dot" title="Online" />
-                    )}
-                  </li>
-                ))}
+                {members.map((m) => {
+                  const online = onlineUsers.some((o) => o.userId === m.id);
+                  return (
+                    <li key={m.id}>
+                      <span className="fx-chatwin__member-avatar">{m.name.charAt(0)}</span>
+                      <span className="fx-chatwin__member-name">{m.name}</span>
+                      {online && <span className="fx-chatwin__online-pill">Online</span>}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
@@ -323,7 +398,7 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
                 onClick={() => setMuted((v) => !v)}
               >
                 {muted ? <FiBellOff size={16} /> : <FiBell size={16} />}
-                {muted ? "Unmute room" : "Mute room"}
+                {muted ? "Unmute chat" : "Mute chat"}
               </button>
             </div>
 
@@ -342,7 +417,7 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
                 onClose?.();
               }}
             >
-              <FiLogOut size={16} /> Leave room
+              <FiLogOut size={16} /> Leave chat
             </button>
           </aside>
         )}
@@ -365,30 +440,39 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
             title="Attach image"
+            aria-label="Attach image"
           >
             <FiPaperclip size={18} />
           </button>
           <EmojiPicker onSelect={insertEmoji} disabled={uploading} />
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder={uploading ? "Uploading…" : "Type a message…"}
-            value={text}
-            onChange={(e) => {
-              setText(e.target.value);
-              handleTyping();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            disabled={uploading}
-            autoComplete="off"
-            spellCheck="true"
-          />
-          <button type="submit" className="fx-chatwin__send" disabled={!text.trim() || uploading}>
+          <div className="fx-chatwin__composer-field">
+            <textarea
+              ref={inputRef}
+              rows={1}
+              placeholder={uploading ? "Uploading…" : "Message"}
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value);
+                handleTyping();
+                autoResize(e.target);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              disabled={uploading}
+              autoComplete="off"
+              spellCheck="true"
+            />
+          </div>
+          <button
+            type="submit"
+            className="fx-chatwin__send"
+            disabled={!text.trim() || uploading}
+            aria-label="Send message"
+          >
             <FiSend size={18} />
           </button>
         </form>

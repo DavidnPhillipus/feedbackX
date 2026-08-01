@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FiPlus, FiSearch, FiWifi, FiWifiOff } from "react-icons/fi";
+import { useMemo, useState } from "react";
+import { FiEdit, FiSearch, FiWifi, FiWifiOff } from "react-icons/fi";
 import { useChat } from "../context/ChatContext";
 import ChatRoomTemplate from "../Templates/ChatRoomTemplate";
 
@@ -9,9 +9,15 @@ export default function ChatsContainer({ selectedRoom, onSelect, hiddenOnMobile 
   const [showCreate, setShowCreate] = useState(false);
   const [newRoomName, setNewRoomName] = useState("");
 
-  const filtered = rooms.filter((r) =>
-    r.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rooms;
+    return rooms.filter(
+      (r) =>
+        r.name.toLowerCase().includes(q) ||
+        (r.lastMessage || "").toLowerCase().includes(q)
+    );
+  }, [rooms, search]);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -27,19 +33,20 @@ export default function ChatsContainer({ selectedRoom, onSelect, hiddenOnMobile 
     >
       <div className="fx-chatwin__sidebar-head">
         <div>
-          <h2>Messages</h2>
+          <h2>Chats</h2>
           <span className={`fx-chatwin__status${connected ? " fx-chatwin__status--on" : ""}`}>
             {connected ? <FiWifi size={12} /> : <FiWifiOff size={12} />}
-            {connected ? "Live" : "Connecting…"}
+            {connected ? "Connected" : "Connecting…"}
           </span>
         </div>
         <button
           type="button"
           className="fx-chatwin__icon-btn"
-          title="New room"
+          title="New chat room"
+          aria-label="New chat room"
           onClick={() => setShowCreate((v) => !v)}
         >
-          <FiPlus size={18} />
+          <FiEdit size={18} />
         </button>
       </div>
 
@@ -47,39 +54,53 @@ export default function ChatsContainer({ selectedRoom, onSelect, hiddenOnMobile 
         <form className="fx-chatwin__create" onSubmit={handleCreate}>
           <input
             type="text"
-            placeholder="Room name…"
+            placeholder="Name this room…"
             value={newRoomName}
             onChange={(e) => setNewRoomName(e.target.value)}
             autoFocus
           />
-          <button type="submit" className="fx-btn">Create</button>
+          <button type="submit" className="fx-btn">
+            Create
+          </button>
         </form>
       )}
 
       <div className="fx-chatwin__search">
-        <FiSearch size={16} />
+        <FiSearch size={16} aria-hidden="true" />
         <input
-          type="text"
-          placeholder="Search rooms…"
+          type="search"
+          placeholder="Search chats"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          aria-label="Search chats"
         />
       </div>
 
-      <div className="fx-chatwin__room-list">
+      <div className="fx-chatwin__room-list" role="list">
         {!connected && rooms.length === 0 ? (
-          <p className="fx-muted fx-chatwin__empty-list">Connecting to chat…</p>
+          <div className="fx-chatwin__empty-list">
+            <p className="fx-muted">Connecting to chat…</p>
+          </div>
         ) : filtered.length === 0 ? (
-          <p className="fx-muted fx-chatwin__empty-list">No rooms found</p>
+          <div className="fx-chatwin__empty-list">
+            <p className="fx-muted">
+              {search.trim() ? "No chats match your search." : "No chats yet."}
+            </p>
+            {!search.trim() && (
+              <p className="fx-muted">Open Give Feedback on a project to start a room.</p>
+            )}
+          </div>
         ) : (
           filtered.map((r) => (
-            <div
+            <button
               key={r.id}
+              type="button"
+              role="listitem"
               className={`fx-chat-item${selectedRoom?.id === r.id ? " selected" : ""}`}
               onClick={() => onSelect?.(r)}
             >
               <ChatRoomTemplate item={r} />
-            </div>
+            </button>
           ))
         )}
       </div>

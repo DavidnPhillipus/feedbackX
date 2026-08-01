@@ -4,7 +4,6 @@ import {
   connectSocket,
   getChatUser,
   setChatUserName,
-  fetchRooms,
   fetchRoomMessages,
   syncChatUserFromAuth,
   clearChatUser,
@@ -142,7 +141,8 @@ export function ChatProvider({ children }) {
     if (!socket.connected) socket.connect();
     else onConnect();
 
-    fetchRooms().then(setRooms).catch(() => {});
+    // Room list comes from socket register/getRooms so unread counts stay per-user.
+    socket.emit("getRooms");
 
     return () => {
       socket.off("connect", onConnect);

@@ -4,7 +4,7 @@ import ChatRoom from "../components/ChatRoom";
 import { useChat } from "../context/ChatContext";
 import { useSearchParams } from "react-router-dom";
 
-function useIsMobile(breakpoint = 520) {
+function useIsMobile(breakpoint = 640) {
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth <= breakpoint : false
   );
