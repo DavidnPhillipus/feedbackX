@@ -13,11 +13,12 @@ import xss from "./middleware/xss.js";
 import notFound from "./middleware/notFound.js";
 import authRouter from "./routes/auth.js";
 import authenticated from "./middleware/auth.js";
+import { resolveCorsOrigin } from "./config/env.js";
+import prisma from "./prisma.js";
 
 const app = express();
 
-const corsOrigin = process.env.CLIENT_URL?.trim() || "*";
-app.use(cors({ origin: corsOrigin }));
+app.use(cors({ origin: resolveCorsOrigin() }));
 app.use(express.json({ limit: "15mb" }));
 app.use(xss);
 app.use(logging.logRequest);
@@ -25,6 +26,15 @@ app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
 app.get("/", (_req, res) => {
   res.json({ message: "feedbackX API" });
+});
+
+app.get("/health", async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({ status: "ok", db: "up" });
+  } catch {
+    res.status(503).json({ status: "degraded", db: "down" });
+  }
 });
 
 app.use("/v1/auth", authRouter);

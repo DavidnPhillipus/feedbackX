@@ -1,3 +1,4 @@
+import { assertEnv, getPort, resolveCorsOrigin } from "./config/env";
 import http from "http";
 import { Server, Socket } from "socket.io";
 import app from "./app";
@@ -5,8 +6,7 @@ import chatSocket from "./controllers/rooms";
 import prisma from "./prisma";
 import { createRoomForPost, hydrateRoomMessages } from "./chat/store";
 
-const port = Number(process.env.PORT) || 8080;
-const clientOrigin = process.env.CLIENT_URL?.trim() || "*";
+assertEnv();
 
 async function syncPostFeedbackRooms() {
   try {
@@ -26,17 +26,31 @@ async function syncPostFeedbackRooms() {
   }
 }
 
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: clientOrigin, methods: ["GET", "POST"] },
-});
+async function main() {
+  const port = getPort();
+  const server = http.createServer(app);
+  const io = new Server(server, {
+    cors: { origin: resolveCorsOrigin(), methods: ["GET", "POST"] },
+  });
 
-io.on("connection", (socket: Socket) => {
-  console.log("Socket connected:", socket.id);
-  chatSocket(io, socket);
-});
+  io.on("connection", (socket: Socket) => {
+    console.log("Socket connected:", socket.id);
+    chatSocket(io, socket);
+  });
 
-server.listen(port, async () => {
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, "0.0.0.0", () => {
+      server.off("error", reject);
+      resolve();
+    });
+  });
+
   await syncPostFeedbackRooms();
-  console.log(`Server listening on http://localhost:${port} (HTTP + WebSocket)`);
+  console.log(`feedbackX API listening on 0.0.0.0:${port} (HTTP + WebSocket)`);
+}
+
+main().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
 });
