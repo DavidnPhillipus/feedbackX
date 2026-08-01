@@ -8,11 +8,27 @@ export class ValidationError extends Error {
   }
 }
 
+function prismaDbUnavailable(err: any): boolean {
+  const code = err?.code || err?.errorCode;
+  const name = String(err?.name || "");
+  const message = String(err?.message || err || "");
+  return (
+    code === "P1001" ||
+    code === "P1002" ||
+    code === "P1017" ||
+    code === "P2024" ||
+    name.includes("PrismaClientInitializationError") ||
+    /Can't reach database server/i.test(message) ||
+    /Timed out fetching a new connection/i.test(message) ||
+    /Server has closed the connection/i.test(message)
+  );
+}
+
 const errorHandler = (
   err: any,
   _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   if (err instanceof ValidationError) {
     return res.status(400).json({ errors: err.validationErrors });
@@ -30,8 +46,16 @@ const errorHandler = (
     return res.status(404).json({ error: "resource not found" });
   }
 
-  console.log("Error message", err.message);
-  console.log("Error code", err.code);
+  if (prismaDbUnavailable(err)) {
+    console.error("Database unavailable:", err.code || "", err.message);
+    return res.status(503).json({
+      error:
+        "Database is temporarily unreachable. Wake your Supabase project in the dashboard, wait a few seconds, then try again.",
+      code: err.code || "DB_UNAVAILABLE",
+    });
+  }
+
+  console.error("Unhandled error:", err.code || "", err.message || err);
 
   return res.status(500).json({ error: "Something went wrong" });
 };

@@ -33,7 +33,12 @@ app.get("/health", async (_req, res) => {
     await prisma.$queryRaw`SELECT 1`;
     res.status(200).json({ status: "ok", db: "up" });
   } catch {
-    res.status(503).json({ status: "degraded", db: "down" });
+    res.status(503).json({
+      status: "degraded",
+      db: "down",
+      error:
+        "Database is temporarily unreachable. Wake your Supabase project in the dashboard, wait a few seconds, then try again.",
+    });
   }
 });
 

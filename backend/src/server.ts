@@ -3,8 +3,8 @@ import http from "http";
 import { Server, Socket } from "socket.io";
 import app from "./app";
 import chatSocket from "./controllers/rooms";
-import prisma from "./prisma";
-import { createRoomForPost, hydrateRoomMessages } from "./chat/store";
+import prisma, { ensureDbReady } from "./prisma";
+import { createRoomForPost } from "./chat/store";
 
 assertEnv();
 
@@ -12,6 +12,7 @@ async function syncPostFeedbackRooms() {
   try {
     const posts = await prisma.post.findMany({ include: { author: true } });
     for (const post of posts) {
+      // Room metadata only — messages hydrate lazily when someone joins.
       createRoomForPost(
         post.id,
         post.title,
@@ -19,7 +20,6 @@ async function syncPostFeedbackRooms() {
         post.userId,
         post.author?.name || "Author"
       );
-      await hydrateRoomMessages(`post-${post.id}`);
     }
   } catch (err) {
     console.warn("Could not sync post feedback rooms:", err);
@@ -27,6 +27,15 @@ async function syncPostFeedbackRooms() {
 }
 
 async function main() {
+  try {
+    await ensureDbReady();
+  } catch (err) {
+    console.error(
+      "Could not reach the database. Wake your Supabase project and check DATABASE_URL.",
+      err
+    );
+  }
+
   const port = getPort();
   const server = http.createServer(app);
   const io = new Server(server, {

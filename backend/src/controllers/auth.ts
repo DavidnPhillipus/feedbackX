@@ -1,12 +1,18 @@
 import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import prisma from "../prisma.js";
+import prisma, { withDbRetry } from "../prisma.js";
 import * as bcrypt from "bcrypt";
 import { parseRoles, stringifyRoles } from "../utils/roles.js";
 import { buildResetUrl, createPasswordResetToken } from "../utils/passwordReset.js";
 import { isEmailConfigured, sendPasswordResetEmail } from "../utils/mail.js";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET?.trim();
+  if (!secret) {
+    throw new Error("Missing JWT_SECRET");
+  }
+  return secret;
+}
 
 function publicUser(user: {
   id: number;
@@ -33,7 +39,7 @@ function publicUser(user: {
 function issueToken(user: { id: number; username: string; roles: string }) {
   return jwt.sign(
     { id: user.id, username: user.username, roles: parseRoles(user.roles) },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: "6h" }
   );
 }
@@ -41,12 +47,14 @@ function issueToken(user: { id: number; username: string; roles: string }) {
 export const login: RequestHandler = async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await prisma.user.findFirst({
-    where: {
-      OR: [{ username }, { email: username }],
-    },
-    include: { password: true },
-  });
+  const user = await withDbRetry(() =>
+    prisma.user.findFirst({
+      where: {
+        OR: [{ username }, { email: username }],
+      },
+      include: { password: true },
+    })
+  );
 
   if (!user) {
     return res.status(401).json({ message: "Invalid username or email" });
@@ -72,9 +80,11 @@ export const register: RequestHandler = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   const normalizedEmail = email.trim().toLowerCase();
 
-  const existing = await prisma.user.findFirst({
-    where: { OR: [{ username }, { email: normalizedEmail }] },
-  });
+  const existing = await withDbRetry(() =>
+    prisma.user.findFirst({
+      where: { OR: [{ username }, { email: normalizedEmail }] },
+    })
+  );
 
   if (existing) {
     return res.status(409).json({
@@ -85,18 +95,20 @@ export const register: RequestHandler = async (req, res) => {
     });
   }
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      username,
-      email: normalizedEmail,
-      verified: true,
-      roles: stringifyRoles(["USER"]),
-      password: {
-        create: { hash: hashedPassword },
+  const user = await withDbRetry(() =>
+    prisma.user.create({
+      data: {
+        name,
+        username,
+        email: normalizedEmail,
+        verified: true,
+        roles: stringifyRoles(["USER"]),
+        password: {
+          create: { hash: hashedPassword },
+        },
       },
-    },
-  });
+    })
+  );
 
   res.status(201).json({
     message: "Account created. Please log in.",
