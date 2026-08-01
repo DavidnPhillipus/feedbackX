@@ -5,10 +5,15 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "src/app.js",
+  "main": "src/server.ts",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "tsx src/server.ts",
     "dev": "tsx watch src/server.ts",
+    "build": "prisma generate",
+    "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy",
     "db:generate": "prisma generate",
@@ -17,7 +22,8 @@
     "db:setup:seed": "npm run db:setup && tsx src/seed.ts",
     "db:storage": "tsx src/setup-supabase-storage.ts",
     "db:reset": "prisma migrate reset --force",
-    "test:smoke": "tsx src/smoke-test.ts"
+    "test:smoke": "tsx src/smoke-test.ts",
+    "test:chat": "tsx src/chat-smoke.ts"
   },
   "keywords": [],
   "dependencies": {
@@ -35,9 +41,10 @@
     "multer": "^2.2.0",
     "nanoid": "^5.1.5",
     "nodemailer": "^7.0.5",
-    "nodemon": "^3.1.10",
+    "prisma": "^6.15.0",
     "resend": "^6.16.0",
     "socket.io": "^4.8.1",
+    "tsx": "^4.20.3",
     "xss": "^1.0.15",
     "zod": "^4.1.5"
   },
@@ -46,9 +53,9 @@
     "@types/multer": "^2.1.0",
     "@types/node": "^24.3.0",
     "@types/nodemailer": "^6.4.17",
-    "prisma": "^6.15.0",
+    "nodemon": "^3.1.10",
+    "socket.io-client": "^4.8.3",
     "ts-node": "^10.9.2",
-    "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   }
 }
