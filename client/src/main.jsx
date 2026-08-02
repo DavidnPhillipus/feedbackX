@@ -5,7 +5,7 @@ import { RouterProvider } from 'react-router-dom'
 import { SidebarProvider } from './components/SidebarContext'
 import { ChatProvider } from './context/ChatContext'
 import { AuthProvider } from './context/AuthContext'
-import './css/app.css'
+import './css/App.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
