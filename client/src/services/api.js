@@ -132,18 +132,24 @@ export async function createPost({
   });
 }
 
-import { uploadToSupabase } from "./supabase.js";
-
-export async function uploadProjectFile(file) {
+async function uploadForm(path, field, file) {
   const token = getToken();
   const form = new FormData();
-  form.append("file", file);
+  form.append(field, file);
 
-  const res = await fetch(apiUrl("/upload/file"), {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: form,
-  });
+  let res;
+  try {
+    res = await fetch(apiUrl(path), {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+  } catch {
+    throw new Error(
+      "Cannot reach the API. Make sure the backend is running and try again."
+    );
+  }
+
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(data.error || data.message || "Upload failed");
@@ -151,21 +157,12 @@ export async function uploadProjectFile(file) {
   return data;
 }
 
-export async function uploadAvatar(file) {
-  const token = getToken();
-  const form = new FormData();
-  form.append("image", file);
+export async function uploadProjectFile(file) {
+  return uploadForm("/upload/file", "file", file);
+}
 
-  const res = await fetch(apiUrl("/upload/image"), {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: form,
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(data.error || data.message || "Upload failed");
-  }
-  return data;
+export async function uploadAvatar(file) {
+  return uploadForm("/upload/image", "image", file);
 }
 
 export async function uploadImage(fileOrBase64) {
@@ -173,8 +170,10 @@ export async function uploadImage(fileOrBase64) {
     const file =
       fileOrBase64 instanceof File
         ? fileOrBase64
-        : new File([fileOrBase64], "upload.jpg", { type: fileOrBase64.type || "image/jpeg" });
-    return uploadToSupabase(file);
+        : new File([fileOrBase64], "upload.jpg", {
+            type: fileOrBase64.type || "image/jpeg",
+          });
+    return uploadAvatar(file);
   }
 
   return request("/upload/image", {

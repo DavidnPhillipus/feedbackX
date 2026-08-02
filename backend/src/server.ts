@@ -5,6 +5,7 @@ import app from "./app";
 import chatSocket from "./controllers/rooms";
 import prisma, { ensureDbReady } from "./prisma";
 import { createRoomForPost } from "./chat/store";
+import { setupSupabaseStorage } from "./setup-supabase-storage";
 
 assertEnv();
 
@@ -29,6 +30,8 @@ async function syncPostFeedbackRooms() {
 async function main() {
   try {
     await ensureDbReady();
+    // Ensures post-images bucket + RLS exist (safe to re-run).
+    await setupSupabaseStorage();
   } catch (err) {
     console.error(
       "Could not reach the database. Wake your Supabase project and check DATABASE_URL.",

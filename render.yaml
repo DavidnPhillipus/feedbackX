@@ -1,6 +1,10 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
 # Connect this repo in Render → New → Blueprint.
 # Set sync:false env vars in the dashboard after create (Supabase, JWT, Vite URLs).
+#
+# Uploads need API SUPABASE_URL + SUPABASE_ANON_KEY. On boot the API ensures the
+# `post-images` Storage bucket exists. Web needs VITE_API_URL / VITE_SOCKET_URL
+# pointing at the API origin (no trailing slash).
 
 services:
   - type: web

@@ -145,12 +145,31 @@ async function testUploads() {
     new Blob(["smoke test document"], { type: "text/plain" }),
     "smoke.txt"
   );
-  await api("/upload/file", {
+  const txtUp = await api("/upload/file", {
     method: "POST",
     auth: true,
     body: txtForm as unknown as BodyInit,
   });
+  if (!txtUp.url) throw new Error("Document upload missing url");
   ok("Upload document");
+
+  // Prefer Supabase public URLs in configured environments (not ephemeral /uploads).
+  const urls = [imageUp.url, fileUp.url, txtUp.url] as string[];
+  const supabaseHosted = urls.every(
+    (u) => u.includes("supabase.co/storage") || u.includes("/storage/v1/object/public/")
+  );
+  if (process.env.REQUIRE_SUPABASE_UPLOADS === "1" && !supabaseHosted) {
+    throw new Error(
+      `Expected Supabase Storage URLs, got: ${urls.join(", ")}`
+    );
+  }
+  if (supabaseHosted) {
+    ok("Uploads landed in Supabase Storage");
+  } else {
+    console.warn(
+      "  ⚠ Uploads used local /uploads fallback — fine for local dev, not for Render"
+    );
+  }
 }
 
 async function testPosts() {

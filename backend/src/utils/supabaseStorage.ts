@@ -8,15 +8,29 @@ import {
   getMediaKind,
 } from "./fileTypes.js";
 
+function isProduction() {
+  return process.env.NODE_ENV === "production";
+}
+
 function getPublicBaseUrl() {
-  const configured = process.env.PUBLIC_BASE_URL || process.env.BACKEND_URL || process.env.RENDER_EXTERNAL_URL || process.env.URL;
+  const configured =
+    process.env.PUBLIC_BASE_URL ||
+    process.env.BACKEND_URL ||
+    process.env.RENDER_EXTERNAL_URL ||
+    process.env.URL;
   return (configured || `http://localhost:${process.env.PORT || 8080}`).replace(/\/$/, "");
 }
 
-async function uploadLocally(buffer: Buffer, mimeType: string, originalName?: string): Promise<string> {
+async function uploadLocally(
+  buffer: Buffer,
+  mimeType: string,
+  originalName?: string
+): Promise<string> {
   const ext = originalName?.split(".").pop()?.toLowerCase() || extensionForMime(mimeType);
   const base =
-    originalName?.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "") || getMediaKind(mimeType) || "file";
+    originalName?.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "") ||
+    getMediaKind(mimeType) ||
+    "file";
   const filename = `${Date.now()}-${base}.${ext}`;
   const uploadDir = path.resolve(process.cwd(), "uploads");
   await mkdir(uploadDir, { recursive: true });
@@ -42,29 +56,46 @@ export async function uploadToSupabase(
     throw new Error(`File too large (max ${mb}MB for this type)`);
   }
 
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+    if (isProduction()) {
+      throw new Error("File storage is not configured (missing SUPABASE_URL / SUPABASE_ANON_KEY)");
+    }
+    console.warn("Supabase credentials missing — using local /uploads fallback");
+    return uploadLocally(buffer, mimeType, originalName);
+  }
+
   try {
     const ext = originalName?.split(".").pop()?.toLowerCase() || extensionForMime(mimeType);
     const base =
-      originalName?.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "") || getMediaKind(mimeType) || "file";
+      originalName?.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "") ||
+      getMediaKind(mimeType) ||
+      "file";
     const filename = `${Date.now()}-${base}.${ext}`;
 
-    const { data, error } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .upload(filename, buffer, {
-        contentType: mimeType,
-        upsert: false,
-      });
+    const { data, error } = await supabase.storage.from(STORAGE_BUCKET).upload(filename, buffer, {
+      contentType: mimeType,
+      upsert: false,
+    });
 
     if (error) {
       throw new Error(error.message || "Failed to upload to Supabase Storage");
     }
 
-    const { data: publicData } = supabase.storage
-      .from(STORAGE_BUCKET)
-      .getPublicUrl(data.path);
+    const { data: publicData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
 
     return publicData.publicUrl;
   } catch (error) {
+    // Ephemeral disks (Render) lose local files on restart — never hide Storage failures in prod.
+    if (isProduction()) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("Supabase upload failed:", message);
+      throw new Error(
+        message.includes("Bucket not found")
+          ? "Storage bucket missing. Run npm run db:storage once against this database."
+          : message || "Failed to upload file"
+      );
+    }
+
     console.warn("Supabase upload failed, using local fallback storage:", error);
     return uploadLocally(buffer, mimeType, originalName);
   }

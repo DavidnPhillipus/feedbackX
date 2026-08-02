@@ -35,10 +35,15 @@ const errorHandler = (
   }
 
   if (err.code === "LIMIT_FILE_SIZE") {
-    return res.status(400).json({ error: "Image too large (max 10MB)" });
+    return res.status(400).json({
+      error: "File too large (images max 10MB; videos max 50MB; PDF/docs max 25MB)",
+    });
   }
 
-  if (err.message?.includes("Only image files")) {
+  if (
+    err.message?.includes("Only image files") ||
+    err.message?.includes("Unsupported file type")
+  ) {
     return res.status(400).json({ error: err.message });
   }
 

@@ -14,7 +14,7 @@ import {
 } from "react-icons/fi";
 import { useChat } from "../context/ChatContext";
 import { isSameChatUser } from "../services/socket";
-import { uploadToSupabase } from "../services/supabase";
+import * as api from "../services/api";
 import EmojiPicker from "./EmojiPicker";
 import UserAvatar from "./UserAvatar";
 import { isEmojiOnly } from "../utils/emoji";
@@ -140,11 +140,12 @@ export default function ChatRoom({ room, onClose, settingsOpen, onToggleSettings
 
     setUploading(true);
     try {
-      const { url } = await uploadToSupabase(file);
+      // Same authenticated API path as project uploads (Supabase via backend).
+      const uploaded = await api.uploadProjectFile(file);
       sendMessage(text, {
-        url,
+        url: uploaded.url,
         name: file.name,
-        type: file.type,
+        type: file.type || uploaded.type,
       });
       setText("");
       requestAnimationFrame(() => autoResize(inputRef.current));
