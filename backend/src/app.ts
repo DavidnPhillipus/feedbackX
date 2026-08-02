@@ -7,6 +7,8 @@ import repliesRouter from "./routes/replies.js";
 import roomsRouter from "./routes/rooms.js";
 import invitesRouter from "./routes/invites.js";
 import uploadRouter from "./routes/upload.js";
+import adminRouter from "./routes/admin.js";
+import reportsRouter from "./routes/reports.js";
 import logging from "./middleware/logging.js";
 import errors from "./middleware/errors.js";
 import xss from "./middleware/xss.js";
@@ -52,6 +54,8 @@ app.use("/v1/posts", postsRouter);
 app.use("/v1/replies", repliesRouter);
 app.use("/v1/invites", invitesRouter);
 app.use("/v1/upload", uploadRouter);
+app.use("/v1/reports", reportsRouter);
+app.use("/v1/admin", adminRouter);
 
 app.use(errors.errorHandler);
 app.use(notFound);

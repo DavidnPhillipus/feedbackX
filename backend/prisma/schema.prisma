@@ -17,6 +17,8 @@ model User {
   verified  Boolean  @default(false)
   avatarUrl String?
   bio       String?
+  bannedAt  DateTime?
+  banReason String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   password  Password?
@@ -30,6 +32,8 @@ model User {
   replies   Reply[]
   sentInvites     Invite[] @relation("Inviter")
   receivedInvites Invite[] @relation("Invited")
+  reportsFiled    Report[] @relation("Reporter")
+  reportsAgainst  Report[] @relation("ReportedUser")
 }
 
 model Password {
@@ -149,4 +153,24 @@ model ChatMessage {
   createdAt      DateTime @default(now())
 
   @@index([roomId, createdAt])
+}
+
+model Report {
+  id             Int       @id @default(autoincrement())
+  reporterId     Int
+  targetType     String
+  targetId       String
+  reason         String
+  details        String?
+  status         String    @default("open")
+  reportedUserId Int?
+  createdAt      DateTime  @default(now())
+  reviewedAt     DateTime?
+  reviewerNote   String?
+  reporter       User      @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser   User?     @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
+  @@index([reporterId])
 }

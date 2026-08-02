@@ -70,6 +70,15 @@ export const login: RequestHandler = async (req, res) => {
     return res.status(401).json({ message: "Invalid password" });
   }
 
+  if (user.bannedAt) {
+    return res.status(403).json({
+      message: user.banReason
+        ? `Account banned: ${user.banReason}`
+        : "This account has been banned",
+      code: "ACCOUNT_BANNED",
+    });
+  }
+
   const token = issueToken(user);
   res.json({ token, user: publicUser(user) });
 };

@@ -7,6 +7,7 @@ import ExploreCard from "../Templates/ExploreCard";
 import FollowButton from "../components/FollowButton";
 import UserAvatar from "../components/UserAvatar";
 import ProfileStats from "../components/ProfileStats";
+import ReportButton from "../components/ReportButton";
 
 const PAGE_SIZE = 30;
 
@@ -138,6 +139,14 @@ export default function CreatorProfile() {
               initialFollowing={profile.isFollowing}
               size="md"
             />
+            {currentUser && currentUser.id !== profile.id && (
+              <ReportButton
+                targetType="user"
+                targetId={profile.id}
+                reportedUserId={profile.id}
+                className="fx-btn fx-btn--secondary"
+              />
+            )}
           </div>
         </div>
 

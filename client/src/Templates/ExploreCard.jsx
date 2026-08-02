@@ -5,6 +5,7 @@ import ReactionBar from "../components/ReactionBar";
 import FollowButton from "../components/FollowButton";
 import PostMedia from "../components/PostMedia";
 import UserAvatar from "../components/UserAvatar";
+import ReportButton from "../components/ReportButton";
 
 export default function ExploreCard({
   id,
@@ -77,6 +78,14 @@ export default function ExploreCard({
           <button type="button" className="fx-btn" onClick={giveFeedback}>
             Give Feedback
           </button>
+        )}
+        {user && !isOwner && (
+          <ReportButton
+            targetType="post"
+            targetId={id}
+            reportedUserId={userId}
+            className="fx-btn fx-btn--ghost"
+          />
         )}
       </div>
     </article>

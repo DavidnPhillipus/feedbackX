@@ -91,9 +91,9 @@ export default function SideBar() {
   const moreItems = [
     { label: "Invites", icon: FiMail, to: "/Invites" },
     {
-      label: "Manage Users",
+      label: "Admin",
       icon: FiUsers,
-      to: "/admin/users",
+      to: "/admin",
       hidden: !isAdmin,
     },
     { label: "Log out", icon: FiLogOut, onClick: handleLogout, danger: true },

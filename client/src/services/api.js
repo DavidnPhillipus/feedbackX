@@ -212,6 +212,58 @@ export async function deleteUser(id) {
   return request(`/users/${id}`, { method: "DELETE" });
 }
 
+export async function fetchAdminStats() {
+  return request("/admin/stats");
+}
+
+export async function fetchAdminUsers({ page = 1, limit = 30, q = "", banned, role } = {}) {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (q) params.set("q", q);
+  if (banned != null && banned !== "") params.set("banned", String(banned));
+  if (role) params.set("role", role);
+  return request(`/admin/users?${params}`);
+}
+
+export async function updateAdminUser(id, body) {
+  return request(`/admin/users/${id}`, { method: "PATCH", body });
+}
+
+export async function deleteAdminUser(id) {
+  return request(`/admin/users/${id}`, { method: "DELETE" });
+}
+
+export async function fetchAdminPosts({ page = 1, limit = 30, q = "", published } = {}) {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (q) params.set("q", q);
+  if (published != null && published !== "") params.set("published", String(published));
+  return request(`/admin/posts?${params}`);
+}
+
+export async function updateAdminPost(id, body) {
+  return request(`/admin/posts/${id}`, { method: "PATCH", body });
+}
+
+export async function deleteAdminPost(id) {
+  return request(`/admin/posts/${id}`, { method: "DELETE" });
+}
+
+export async function createReport(body) {
+  return request("/reports", { method: "POST", body });
+}
+
+export async function fetchAdminReports({ page = 1, limit = 30, status = "open" } = {}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    status,
+  });
+  return request(`/admin/reports?${params}`);
+}
+
+export async function updateAdminReport(id, body) {
+  return request(`/admin/reports/${id}`, { method: "PATCH", body });
+}
+
 export async function fetchUserFollowers(userId, { page = 1, limit = 30 } = {}) {
   const params = new URLSearchParams({ page: String(page), limit: String(limit) });
   return request(`/users/${userId}/followers?${params}`);
@@ -272,6 +324,16 @@ export default {
   fetchUsers,
   fetchCreators,
   deleteUser,
+  fetchAdminStats,
+  fetchAdminUsers,
+  updateAdminUser,
+  deleteAdminUser,
+  fetchAdminPosts,
+  updateAdminPost,
+  deleteAdminPost,
+  createReport,
+  fetchAdminReports,
+  updateAdminReport,
   fetchUserPosts,
   fetchInvites,
   acceptInvite,

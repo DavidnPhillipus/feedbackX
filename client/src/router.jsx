@@ -14,7 +14,12 @@ import PostPage from './pages/Post';
 import MyProjects from './pages/MyProjects';
 import Creators from './pages/Creators';
 import CreatorProfile from './pages/CreatorProfile';
-import AdminUsers from './pages/AdminUsers';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminOverview from './pages/admin/AdminOverview';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminContent from './pages/admin/AdminContent';
+import AdminReports from './pages/admin/AdminReports';
+import AdminRoute from './components/AdminRoute';
 import ProtectedRoute, { PublicOnlyRoute } from './components/ProtectedRoute';
 
 import { createBrowserRouter, Navigate } from 'react-router-dom';
@@ -77,7 +82,20 @@ export const router = createBrowserRouter([
       { path: '/creators/:id', element: <CreatorProfile /> },
       { path: '/feedbackRooms', element: <FeedbackRooms /> },
       { path: '/Invites', element: <Invites /> },
-      { path: '/admin/users', element: <AdminUsers /> },
+      {
+        path: '/admin',
+        element: (
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        ),
+        children: [
+          { index: true, element: <AdminOverview /> },
+          { path: 'users', element: <AdminUsers /> },
+          { path: 'content', element: <AdminContent /> },
+          { path: 'reports', element: <AdminReports /> },
+        ],
+      },
     ],
   },
 ]);

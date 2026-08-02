@@ -90,10 +90,10 @@ export default function MobileBottomNav({ onSearchOpen }) {
       ? [
           {
             key: "admin",
-            label: "Manage Users",
-            hint: "Admin tools",
+            label: "Admin",
+            hint: "Users, content, reports",
             icon: FiUsers,
-            to: "/admin/users",
+            to: "/admin",
           },
         ]
       : []),
@@ -111,7 +111,7 @@ export default function MobileBottomNav({ onSearchOpen }) {
     },
   ];
 
-  const secondaryActive = ["/creators", "/projects", "/Invites", "/admin/users"].some(
+  const secondaryActive = ["/creators", "/projects", "/Invites", "/admin"].some(
     (path) => location.pathname === path || location.pathname.startsWith(`${path}/`)
   );
 
